@@ -34,12 +34,21 @@ export function SiteHeader() {
   }, [open]);
 
   return (
+    <>
+    {/* Lớp tối phủ trang khi mở menu mobile: làm nội dung phía sau lùi xuống, chạm vào là đóng. */}
+    <div
+      aria-hidden
+      onClick={() => setOpen(false)}
+      className={`fixed inset-0 z-40 bg-ink/70 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+        open ? "opacity-100" : "pointer-events-none opacity-0"
+      }`}
+    />
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
       <div
         ref={barRef}
         style={backdrop ? { backdropFilter: backdrop, WebkitBackdropFilter: backdrop } : undefined}
         className={`mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-3 transition-all duration-500 md:px-6 ${
-          solid ? "glass shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
+          open ? "glass glass-menu" : solid ? "glass shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
         }`}
       >
         <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} — về đầu trang`}>
@@ -65,9 +74,9 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <a href="#lien-he" className="btn-primary hidden rounded-full px-5 py-2.5 text-sm font-semibold text-white sm:inline-flex">
+          <Link href="/#lien-he" className="btn-primary hidden rounded-full px-5 py-2.5 text-sm font-semibold text-white sm:inline-flex">
             Hợp tác ngay
-          </a>
+          </Link>
           <button
             type="button"
             className="grid h-10 w-10 place-items-center rounded-xl border border-line text-fg md:hidden"
@@ -84,11 +93,11 @@ export function SiteHeader() {
       <nav
         id="mobile-nav"
         aria-label="Điều hướng di động"
-        className={`glass mx-auto mt-2 max-w-6xl overflow-hidden rounded-2xl transition-all duration-500 md:hidden ${
+        className={`glass glass-menu mx-auto mt-2 max-w-6xl overflow-hidden rounded-2xl transition-all duration-500 md:hidden ${
           open ? "max-h-96 opacity-100" : "pointer-events-none max-h-0 border-transparent opacity-0"
         }`}
       >
-        <ul className="p-2">
+        <ul className="divide-y divide-line p-2">
           {NAV_ITEMS.map((item, i) => (
             <li
               key={item.href}
@@ -99,14 +108,26 @@ export function SiteHeader() {
                 href={item.href}
                 onClick={() => setOpen(false)}
                 tabIndex={open ? 0 : -1}
-                className="block rounded-xl px-4 py-3 font-medium text-fg hover:bg-surface-strong"
+                className="flex items-center justify-between rounded-xl px-4 py-3.5 text-base font-semibold text-fg active:bg-surface-strong"
               >
                 {item.label}
+                <span aria-hidden className="text-subtle">›</span>
               </a>
             </li>
           ))}
         </ul>
+        <div className="px-4 pb-4 pt-1 sm:hidden">
+          <Link
+            href="/#lien-he"
+            onClick={() => setOpen(false)}
+            tabIndex={open ? 0 : -1}
+            className="btn-primary flex w-full justify-center rounded-xl px-5 py-3 font-semibold text-white"
+          >
+            Hợp tác ngay
+          </Link>
+        </div>
       </nav>
     </header>
+    </>
   );
 }

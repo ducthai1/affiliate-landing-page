@@ -108,8 +108,16 @@ body {
 .glass {
   background: linear-gradient(160deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.02));
   border: 1px solid var(--color-line);
-  backdrop-filter: blur(18px) saturate(140%);
-  -webkit-backdrop-filter: blur(18px) saturate(140%);
+  /* KHÔNG viết `backdrop-filter:` tay: Lightning CSS (Next build) gộp nó với bản -webkit- thành MỘT
+     dòng -webkit- mà Chrome bỏ qua → mọi khối kính mất blur. Utility Tailwind giữ đủ cả hai dòng. */
+  @apply backdrop-blur-[18px] backdrop-saturate-[1.4];
+}
+/* Khung menu mobile: đè lên hero rực màu nên cần nền đặc hơn nhiều mới đọc được. */
+.glass-menu {
+  @apply backdrop-blur-[24px] backdrop-saturate-[1.6];
+  background: linear-gradient(160deg, rgb(22 22 38 / 0.92), rgb(10 10 18 / 0.94));
+  border-color: var(--color-line-strong);
+  box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.9);
 }
 
 /* ---------- Viền gradient xoay (khung form) ---------- */
