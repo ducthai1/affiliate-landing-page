@@ -49,7 +49,7 @@ export function ChannelCard({ channel }: Props) {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
             {channel.emoji} {channel.niche}
           </p>
-          <h3 id={`${channelAnchorId(channel)}-name`} className="mt-1 truncate font-display text-xl font-bold md:text-2xl">
+          <h3 id={`${channelAnchorId(channel)}-name`} className="mt-1 font-display text-xl font-bold leading-tight text-balance break-words md:text-2xl">
             {channel.name}
           </h3>
         </div>

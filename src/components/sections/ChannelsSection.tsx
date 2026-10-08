@@ -19,7 +19,8 @@ export function ChannelsSection() {
         />
         <ul className="grid gap-6 md:grid-cols-2">
           {CHANNELS.map((c, i) => (
-            <li key={c.key}>
+            // min-w-0: ô lưới mặc định không co nhỏ hơn nội dung → tên kênh dài đẩy cả trang tràn ngang trên điện thoại.
+            <li key={c.key} className="min-w-0">
               <Reveal delay={i * 90} className="h-full">
                 <ChannelCard channel={c} />
               </Reveal>

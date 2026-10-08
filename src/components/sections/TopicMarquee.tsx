@@ -6,8 +6,9 @@ export function TopicMarquee() {
   const loop = [...topics, ...topics];
 
   return (
+    // Khung ngoài cắt phần góc lòi ra khi dải bị xoay -1° (nếu không trang tràn ngang ~1px trên điện thoại).
+    <div aria-hidden className="overflow-hidden py-3">
     <div
-      aria-hidden
       className="relative -rotate-1 overflow-hidden border-y border-line bg-surface py-5 [mask-image:linear-gradient(90deg,transparent,#000_12%,#000_88%,transparent)]"
     >
       <div className="flex w-max animate-marquee gap-10 hover:[animation-play-state:paused]">
@@ -18,6 +19,7 @@ export function TopicMarquee() {
           </span>
         ))}
       </div>
+    </div>
     </div>
   );
 }
