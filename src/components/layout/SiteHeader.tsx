@@ -4,12 +4,20 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { NAV_ITEMS, SITE } from "@/config/site.const";
 import { CloseIcon, MenuIcon } from "@/components/ui/Icons";
+import { useGlassSurface } from "@/hooks/use-glass-surface";
 
 const SCROLLED_AFTER_PX = 24;
+// Đúng thông số navbar growx-fe (Figma: Refraction 80 · Depth 20 · Dispersion 50 · Frost 4, mép trên 0.2×).
+// Đừng tăng Dispersion / giảm Frost / thêm saturate: tán sắc cầu vồng ở mép bị rực, gây chói mắt (user chốt 08/10).
+const HEADER_GLASS = { refraction: 80, depth: 20, dispersion: 50, frost: 4, topFactor: 0.2 };
 
 export function SiteHeader() {
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
+  const solid = scrolled || open;
+  // Nền kính khúc xạ kiểu growx-fe (bóp méo nội dung bên dưới ở mép thanh) — chỉ khi thanh có nền.
+  const [barRef, refraction] = useGlassSurface<HTMLDivElement>({ enabled: solid, ...HEADER_GLASS });
+  const backdrop = refraction;
 
   useEffect(() => {
     const onScroll = () => setScrolled(window.scrollY > SCROLLED_AFTER_PX);
@@ -28,8 +36,10 @@ export function SiteHeader() {
   return (
     <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
       <div
+        ref={barRef}
+        style={backdrop ? { backdropFilter: backdrop, WebkitBackdropFilter: backdrop } : undefined}
         className={`mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-3 transition-all duration-500 md:px-6 ${
-          scrolled || open ? "glass shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
+          solid ? "glass shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
         }`}
       >
         <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} — về đầu trang`}>
