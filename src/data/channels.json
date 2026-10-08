@@ -1,0 +1,65 @@
+{
+  "updatedAt": "2026-10-08T06:57:09+00:00",
+  "channels": [
+    {
+      "key": "goc-bep-thong-minh",
+      "name": "Góc Bếp Thông Minh",
+      "pageId": "1433003223223568",
+      "niche": "đồ gia dụng & bếp tiện ích",
+      "description": "Dụng cụ bếp tiện lợi, mẹo nấu nướng nhanh gọn và những món đồ giúp căn bếp nhà bạn gọn gàng, sạch sẽ hơn mỗi ngày.",
+      "topics": [
+        "Dụng cụ bếp",
+        "Mẹo nấu nướng",
+        "Bảo quản thực phẩm"
+      ],
+      "need": "Đồ bếp",
+      "emoji": "🍳",
+      "accent": "orange"
+    },
+    {
+      "key": "tap-hoa-van-phong",
+      "name": "Tạp Hóa Văn Phòng",
+      "pageId": "1009446318924371",
+      "niche": "Văn phòng phẩm & góc làm việc",
+      "description": "Góc làm việc gọn đẹp, phụ kiện bàn làm việc, văn phòng phẩm xinh xắn và các món đồ nhỏ giúp ngày làm việc nhẹ nhàng hơn.",
+      "topics": [
+        "Góc làm việc",
+        "Văn phòng phẩm",
+        "Phụ kiện bàn"
+      ],
+      "need": "Văn phòng",
+      "emoji": "🗂️",
+      "accent": "sky"
+    },
+    {
+      "key": "tram-thu-cung-pawsome",
+      "name": "Trạm Thú Cưng Pawsome",
+      "pageId": "1336339862898708",
+      "niche": "đồ cho thú cưng",
+      "description": "Đồ chơi, phụ kiện và mẹo chăm sóc cho các boss chó mèo — vui nhộn, dễ thương và thật sự hữu ích cho người nuôi.",
+      "topics": [
+        "Chó mèo",
+        "Phụ kiện thú cưng",
+        "Mẹo chăm boss"
+      ],
+      "need": "Thú cưng",
+      "emoji": "🐾",
+      "accent": "pink"
+    },
+    {
+      "key": "nha-gon-sach",
+      "name": "Nhà Gọn Sạch",
+      "pageId": "1290063697531470",
+      "niche": "dọn dẹp, sắp xếp, mẹo vặt",
+      "description": "Mẹo dọn dẹp, sắp xếp tủ kệ và những món đồ lưu trữ thông minh giúp từng góc nhà luôn ngăn nắp, thoáng đãng.",
+      "topics": [
+        "Sắp xếp tủ kệ",
+        "Mẹo dọn dẹp",
+        "Đồ lưu trữ"
+      ],
+      "need": "Dọn dẹp",
+      "emoji": "🧺",
+      "accent": "teal"
+    }
+  ]
+}
