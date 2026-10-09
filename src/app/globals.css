@@ -104,12 +104,17 @@ body {
   animation: shimmer 8s linear infinite;
 }
 
-/* ---------- Kính mờ ---------- */
+/* ---------- Kính ----------
+   `.glass` = nền kính tĩnh (gradient + viền), KHÔNG làm mờ nền sau. Đừng thêm backdrop-filter vào đây:
+   23 khối cùng làm mờ trên nền cực quang động → cuộn tụt ~24fps, Safari/Mac chớp cả màn hình (09/10).
+   `.glass-blur` = làm mờ nền thật — CHỈ cho lớp nổi trên cùng (header, menu mobile).
+   KHÔNG viết `backdrop-filter:` tay: Lightning CSS (Next build) gộp nó với bản -webkit- thành MỘT
+   dòng -webkit- mà Chrome bỏ qua. Utility Tailwind giữ đủ cả hai dòng. */
 .glass {
   background: linear-gradient(160deg, rgb(255 255 255 / 0.07), rgb(255 255 255 / 0.02));
   border: 1px solid var(--color-line);
-  /* KHÔNG viết `backdrop-filter:` tay: Lightning CSS (Next build) gộp nó với bản -webkit- thành MỘT
-     dòng -webkit- mà Chrome bỏ qua → mọi khối kính mất blur. Utility Tailwind giữ đủ cả hai dòng. */
+}
+.glass-blur {
   @apply backdrop-blur-[18px] backdrop-saturate-[1.4];
 }
 /* Khung menu mobile: đè lên hero rực màu nên cần nền đặc hơn nhiều mới đọc được. */
@@ -172,11 +177,11 @@ body {
 .reveal {
   opacity: 0;
   transform: translateY(28px);
-  filter: blur(6px);
-  transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1), filter 0.8s ease;
+  /* Không dùng filter: blur ở đây — đổi filter → none làm Safari dựng lại lớp và chớp màn hình. */
+  transition: opacity 0.8s cubic-bezier(.22,1,.36,1), transform 0.8s cubic-bezier(.22,1,.36,1);
   transition-delay: var(--delay, 0ms);
 }
-.reveal[data-visible="true"] { opacity: 1; transform: none; filter: none; }
+.reveal[data-visible="true"] { opacity: 1; transform: none; }
 
 /* ---------- Thẻ kênh: đèn rọi theo chuột + nghiêng 3D ---------- */
 .spotlight {
@@ -281,7 +286,7 @@ body {
     animation-iteration-count: 1 !important;
     transition-duration: 0.001ms !important;
   }
-  .reveal { opacity: 1; transform: none; filter: none; }
+  .reveal { opacity: 1; transform: none; }
   .spotlight { transform: none !important; }
 }
 @keyframes target-pulse {

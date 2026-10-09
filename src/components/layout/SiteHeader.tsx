@@ -48,7 +48,7 @@ export function SiteHeader() {
         ref={barRef}
         style={backdrop ? { backdropFilter: backdrop, WebkitBackdropFilter: backdrop } : undefined}
         className={`mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-3 transition-all duration-500 md:px-6 ${
-          open ? "glass glass-menu" : solid ? "glass shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
+          open ? "glass glass-menu" : solid ? "glass glass-blur shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
         }`}
       >
         <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} — về đầu trang`}>
