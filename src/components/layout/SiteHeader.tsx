@@ -26,6 +26,13 @@ export function SiteHeader() {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
+  // Header kính khúc xạ là bộ lọc SVG Chrome tính bằng CPU; nền cực quang phía sau mà còn trôi thì bộ lọc
+  // bị tính lại MỖI khung hình kể cả khi đứng yên → Mac Retina nghẽn CPU, hover trễ vài giây (đo 10/10).
+  // Nên khi header đã có nền kính thì dừng cực quang (xem `[data-glass-header]` trong globals.css).
+  useEffect(() => {
+    document.documentElement.toggleAttribute("data-glass-header", solid);
+  }, [solid]);
+
   useEffect(() => {
     if (!open) return;
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && setOpen(false);

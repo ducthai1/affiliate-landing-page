@@ -278,6 +278,9 @@ body {
   .faq[open]::details-content { height: auto; }
 }
 
+/* Header đang dùng kính khúc xạ → dừng cực quang để bộ lọc SVG (CPU) không phải tính lại mỗi khung hình. */
+html[data-glass-header] .animate-aurora { animation-play-state: paused; }
+
 /* ---------- Giảm chuyển động theo cài đặt hệ thống ---------- */
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
