@@ -1,42 +1,54 @@
+import type { CSSProperties } from "react";
 import { COLLAB_SERVICES, COLLAB_STEPS } from "@/features/landing/landing.const";
+import { buildCollabPinLayout } from "@/features/landing/landing.mapper";
 import { Reveal } from "@/components/motion/Reveal";
 import { SectionHeading } from "@/components/ui/SectionHeading";
+import { CollabPin } from "./CollabPin";
+
+const PIN_LAYOUT = buildCollabPinLayout(COLLAB_SERVICES.length);
 
 export function CollabSection() {
   return (
-    <section id="hop-tac" data-pause-offscreen aria-labelledby="hop-tac-title" className="px-4 py-24 md:py-32">
+    <section id="hop-tac" data-pause-offscreen aria-labelledby="hop-tac-title" className="pb-24 md:pb-32">
+      <CollabPin
+        layout={PIN_LAYOUT}
+        heading={
+          <SectionHeading
+            id="hop-tac-title"
+            eyebrow="Hợp tác"
+            title={
+              <>
+                Cùng nhau đưa sản phẩm <span className="text-gradient">tới đúng người</span>
+              </>
+            }
+            description="Mỗi kênh có tệp người xem riêng, quan tâm thật tới chủ đề của kênh. Chọn hình thức phù hợp với bạn."
+          />
+        }
+      >
+        {COLLAB_SERVICES.map((s, i) => (
+          <li
+            key={s.title}
+            className="perks-slot"
+            data-edge={PIN_LAYOUT.slots[i].edge}
+            style={PIN_LAYOUT.slots[i].vars as CSSProperties}
+          >
+            <div className="glass group relative h-full overflow-hidden rounded-3xl p-6 transition-transform duration-500 hover:-translate-y-1.5">
+              <div
+                aria-hidden
+                className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-3 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
+              />
+              <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface-strong text-2xl transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+                {s.icon}
+              </span>
+              <h3 className="mt-5 font-display text-lg font-bold">{s.title}</h3>
+              <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
+            </div>
+          </li>
+        ))}
+      </CollabPin>
+
+      <div className="px-4">
       <div className="mx-auto max-w-6xl">
-        <SectionHeading
-          id="hop-tac-title"
-          eyebrow="Hợp tác"
-          title={
-            <>
-              Cùng nhau đưa sản phẩm <span className="text-gradient">tới đúng người</span>
-            </>
-          }
-          description="Mỗi kênh có tệp người xem riêng, quan tâm thật tới chủ đề của kênh. Chọn hình thức phù hợp với bạn."
-        />
-
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-          {COLLAB_SERVICES.map((s, i) => (
-            <li key={s.title}>
-              <Reveal delay={i * 80} className="h-full">
-                <div className="glass group relative h-full overflow-hidden rounded-3xl p-6 transition-transform duration-500 hover:-translate-y-1.5">
-                  <div
-                    aria-hidden
-                    className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-3 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
-                  />
-                  <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface-strong text-2xl transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
-                    {s.icon}
-                  </span>
-                  <h3 className="mt-5 font-display text-lg font-bold">{s.title}</h3>
-                  <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
-                </div>
-              </Reveal>
-            </li>
-          ))}
-        </ul>
-
         {/* 3 bước + vạch nối sáng dần theo vị trí cuộn (CSS scroll-driven, xem `.steps-*` trong globals.css).
             Mobile: cột dọc, vạch dọc giữa các vòng số. Desktop: 3 cột, vạch ngang nối tâm các vòng. */}
         <ol className="mt-16 grid gap-8 md:grid-cols-3 md:gap-6">
@@ -63,6 +75,7 @@ export function CollabSection() {
             </li>
           ))}
         </ol>
+      </div>
       </div>
     </section>
   );

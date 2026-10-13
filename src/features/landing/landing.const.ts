@@ -52,3 +52,17 @@ export const FAQS = [
     a: "Thường trong vòng 1–2 ngày làm việc qua số điện thoại hoặc email bạn để lại.",
   },
 ] as const;
+
+/**
+ * Nhịp ghim của 4 thẻ dịch vụ (kiểu "Tại sao nên là GrowX" của growx-fe):
+ * - Desktop (≥1024): khung đứng yên `desktopRunVh` vh cuộn; thẻ k trồi lên trong phần k/4 của
+ *   `desktopCardsEndPct`% đầu, phần còn lại giữ nguyên để thẻ cuối đứng xong mới tới nội dung dưới.
+ * - Mobile (<1024): chồng bài — thẻ sau trượt vào từ phải, thẻ trước mờ + thu nhỏ; mỗi bước `mobileStepVh` vh,
+ *   giữ thêm `mobileHoldVh` vh sau thẻ cuối.
+ */
+export const COLLAB_PIN = {
+  desktopRunVh: 200,
+  desktopCardsEndPct: 80,
+  mobileStepVh: 70,
+  mobileHoldVh: 30,
+} as const;
