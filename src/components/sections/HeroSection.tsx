@@ -15,7 +15,7 @@ const ORBIT_SLOTS = [
 
 export function HeroSection() {
   return (
-    <section id="top" aria-labelledby="hero-title" className="relative px-4 pb-20 pt-36 md:pb-28 md:pt-44">
+    <section id="top" data-pause-offscreen aria-labelledby="hero-title" className="relative px-4 pb-20 pt-36 md:pb-28 md:pt-44">
       <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="mb-6 inline-flex animate-pop items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-muted">

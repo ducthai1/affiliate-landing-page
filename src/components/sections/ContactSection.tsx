@@ -8,7 +8,7 @@ import { ContactForm } from "./ContactForm";
 
 export function ContactSection() {
   return (
-    <section id="lien-he" aria-labelledby="lien-he-title" className="px-4 py-24 md:py-32">
+    <section id="lien-he" data-pause-offscreen aria-labelledby="lien-he-title" className="px-4 py-24 md:py-32">
       <Reveal className="mx-auto max-w-6xl">
         <div className="ring-conic glass grid overflow-hidden rounded-[2rem] lg:grid-cols-[0.9fr_1.1fr]">
           <aside className="relative overflow-hidden border-b border-line p-8 md:p-12 lg:border-b-0 lg:border-r">

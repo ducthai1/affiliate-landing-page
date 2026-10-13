@@ -5,7 +5,7 @@ import { ChannelCard } from "./ChannelCard";
 
 export function ChannelsSection() {
   return (
-    <section id="kenh" aria-labelledby="kenh-title" className="px-4 py-24 md:py-32">
+    <section id="kenh" data-pause-offscreen aria-labelledby="kenh-title" className="px-4 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="kenh-title"

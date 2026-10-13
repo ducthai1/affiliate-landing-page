@@ -44,7 +44,7 @@ export function LegalPage({ doc }: Props) {
             <span className="text-muted">{doc.title}</span>
           </nav>
 
-          <header className="mb-12 animate-pop">
+          <header data-pause-offscreen className="mb-12 animate-pop">
             <h1 className="font-display text-4xl font-extrabold tracking-tight md:text-5xl">
               <span className="text-gradient">{doc.title}</span>
             </h1>

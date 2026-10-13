@@ -28,13 +28,15 @@ export function ChannelCard({ channel }: Props) {
       className="spotlight glass group flex h-full flex-col overflow-hidden rounded-3xl p-6 md:p-8"
       style={{ "--accent": accent, "--accent-2": accent2 } as CSSProperties}
     >
-      {/* quầng màu kênh ở góc */}
+      {/* quầng màu kênh ở góc — -z-10: nằm dưới nội dung + dưới lớp link phủ thẻ */}
       <div
         aria-hidden
-        className="pointer-events-none absolute -right-16 -top-16 h-48 w-48 rounded-full bg-[var(--accent)] opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-40"
+        className="pointer-events-none absolute -right-16 -top-16 -z-10 h-48 w-48 rounded-full bg-[var(--accent)] opacity-20 blur-3xl transition-opacity duration-500 group-hover:opacity-40"
       />
 
-      <div className="relative flex items-center gap-4">
+      {/* Không đặt `relative` ở các khối nội dung: link tên kênh trải ::after phủ cả thẻ (định vị theo <article>),
+          nên bấm vào ảnh, mô tả, chủ đề đều mở page. Riêng hàng nút nằm TRÊN lớp phủ (relative z-10). */}
+      <div className="flex items-center gap-4">
         <span className="relative">
           <span
             aria-hidden
@@ -50,14 +52,22 @@ export function ChannelCard({ channel }: Props) {
             {channel.emoji} {channel.niche}
           </p>
           <h3 id={`${channelAnchorId(channel)}-name`} className="mt-1 font-display text-xl font-bold leading-tight text-balance break-words md:text-2xl">
-            {channel.name}
+            <a
+              href={channelPageUrl(channel)}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="outline-none after:absolute after:inset-0 after:rounded-3xl focus-visible:after:ring-2 focus-visible:after:ring-[var(--accent)]"
+            >
+              {channel.name}
+              <span className="sr-only"> — mở trang Facebook</span>
+            </a>
           </h3>
         </div>
       </div>
 
-      <p className="relative mt-5 flex-1 text-[15px] leading-relaxed text-muted">{channel.description}</p>
+      <p className="mt-5 flex-1 text-[15px] leading-relaxed text-muted">{channel.description}</p>
 
-      <ul className="relative mt-5 flex flex-wrap gap-2" aria-label="Chủ đề">
+      <ul className="mt-5 flex flex-wrap gap-2" aria-label="Chủ đề">
         {channel.topics.map((t) => (
           <li key={t} className="rounded-full border border-line bg-surface px-3 py-1 text-xs text-fg/80">
             {t}
@@ -65,7 +75,7 @@ export function ChannelCard({ channel }: Props) {
         ))}
       </ul>
 
-      <div className="relative mt-7 flex flex-col gap-3 sm:flex-row">
+      <div className="relative z-10 mt-7 flex flex-col gap-3 sm:flex-row">
         <a
           href={channelPageUrl(channel)}
           target="_blank"

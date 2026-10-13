@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Be_Vietnam_Pro } from "next/font/google";
 import { SITE } from "@/config/site.const";
+import { ViewportEffects } from "@/components/motion/ViewportEffects";
 import "./globals.css";
 
 const body = Be_Vietnam_Pro({
@@ -41,7 +42,14 @@ export const viewport: Viewport = {
 export default function RootLayout({ children }: Readonly<{ children: ReactNode }>) {
   return (
     <html lang={SITE.lang} className={body.variable}>
-      <body className="bg-noise font-sans">{children}</body>
+      <body className="bg-noise font-sans">
+        {/* Không có JS thì không ai gắn trạng thái "đã hiện" → cho hiện hết ngay. */}
+        <noscript>
+          <style>{"[data-reveal]{opacity:1!important;transform:none!important}"}</style>
+        </noscript>
+        {children}
+        <ViewportEffects />
+      </body>
     </html>
   );
 }

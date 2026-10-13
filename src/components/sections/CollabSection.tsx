@@ -4,7 +4,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 
 export function CollabSection() {
   return (
-    <section id="hop-tac" aria-labelledby="hop-tac-title" className="px-4 py-24 md:py-32">
+    <section id="hop-tac" data-pause-offscreen aria-labelledby="hop-tac-title" className="px-4 py-24 md:py-32">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="hop-tac-title"
@@ -37,26 +37,32 @@ export function CollabSection() {
           ))}
         </ul>
 
-        <div className="relative mt-16">
-          <div
-            aria-hidden
-            className="absolute left-[16%] right-[16%] top-6 hidden h-px bg-gradient-to-r from-brand-3 via-brand to-brand-2 opacity-40 md:block"
-          />
-          <ol className="relative grid gap-8 md:grid-cols-3 md:gap-6">
+        {/* 3 bước + vạch nối sáng dần theo vị trí cuộn (CSS scroll-driven, xem `.steps-*` trong globals.css).
+            Mobile: cột dọc, vạch dọc giữa các vòng số. Desktop: 3 cột, vạch ngang nối tâm các vòng. */}
+        <ol className="mt-16 grid gap-8 md:grid-cols-3 md:gap-6">
           {COLLAB_STEPS.map((step, i) => (
-            <li key={step.title}>
-              <Reveal delay={i * 120} className="flex flex-col items-center text-center">
-                <span className="relative grid h-12 w-12 place-items-center rounded-full bg-ink font-display text-lg font-bold ring-1 ring-line-strong">
+            <li key={step.title} className="relative">
+              {i < COLLAB_STEPS.length - 1 && (
+                <span
+                  aria-hidden
+                  className="steps-seg absolute left-6 top-12 bottom-[-2rem] w-px md:left-[calc(50%+1.5rem)] md:right-[-50%] md:top-6 md:bottom-auto md:h-px md:w-auto"
+                >
+                  <span className="steps-seg-fill" />
+                </span>
+              )}
+              <Reveal delay={i * 120} className="flex items-start gap-4 md:flex-col md:items-center md:gap-0 md:text-center">
+                <span className="steps-dot relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink font-display text-lg font-bold">
                   <span className="absolute inset-0 rounded-full bg-gradient-to-br from-brand to-brand-2 opacity-30 blur-md" />
                   <span className="relative">{i + 1}</span>
                 </span>
-                <h3 className="mt-4 font-display text-lg font-bold">{step.title}</h3>
-                <p className="mt-1 max-w-xs text-sm text-muted">{step.body}</p>
+                <div className="pt-2.5 md:pt-0">
+                  <h3 className="font-display text-lg font-bold md:mt-4">{step.title}</h3>
+                  <p className="mt-1 max-w-xs text-sm text-muted">{step.body}</p>
+                </div>
               </Reveal>
             </li>
           ))}
-          </ol>
-        </div>
+        </ol>
       </div>
     </section>
   );
