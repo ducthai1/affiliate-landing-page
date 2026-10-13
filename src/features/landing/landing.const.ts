@@ -63,6 +63,7 @@ export const FAQS = [
 export const COLLAB_PIN = {
   desktopRunVh: 200,
   desktopCardsEndPct: 80,
-  mobileStepVh: 70,
-  mobileHoldVh: 30,
+  // Mobile ngắn hơn growx (70/30): ghim 240vh trên điện thoại = vuốt mãi mà nội dung đứng yên → cảm giác ì (14/10).
+  mobileStepVh: 45,
+  mobileHoldVh: 20,
 } as const;
