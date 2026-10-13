@@ -5,24 +5,29 @@ export const HERO_TITLE = {
   highlight: "đúng kênh bạn cần",
 } as const;
 
+// `art` = hình minh hoạ SVG lấp khoảng trống của thẻ vuông trên mobile (components/ui/CollabArt).
 export const COLLAB_SERVICES = [
   {
     icon: "🎬",
+    art: "clip",
     title: "Booking clip review",
     body: "Gửi sản phẩm, chúng tôi lên clip trải nghiệm thật, đăng lên kênh đúng tệp khách quan tâm.",
   },
   {
     icon: "📣",
+    art: "megaphone",
     title: "Quảng bá nhãn hàng",
     body: "Đưa sản phẩm vào chuỗi nội dung mẹo hay hằng ngày — tự nhiên, không gượng ép.",
   },
   {
     icon: "🛒",
+    art: "growth",
     title: "Hợp tác affiliate",
     body: "Gắn link sản phẩm của bạn vào nội dung phù hợp, trả công theo đơn thật.",
   },
   {
     icon: "🧩",
+    art: "idea",
     title: "Đề xuất riêng",
     body: "Có ý tưởng khác? Kể cho chúng tôi — cùng nhau tìm cách làm hợp nhất.",
   },

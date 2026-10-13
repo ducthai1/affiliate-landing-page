@@ -2,6 +2,7 @@ import type { CSSProperties } from "react";
 import { COLLAB_SERVICES, COLLAB_STEPS } from "@/features/landing/landing.const";
 import { buildCollabPinLayout } from "@/features/landing/landing.mapper";
 import { Reveal } from "@/components/motion/Reveal";
+import { CollabArt } from "@/components/ui/CollabArt";
 import { SectionHeading } from "@/components/ui/SectionHeading";
 import { CollabPin } from "./CollabPin";
 
@@ -37,6 +38,8 @@ export function CollabSection() {
                 aria-hidden
                 className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-3 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
+              {/* Hình minh hoạ: chỉ hiện ở thẻ vuông (chồng bài mobile) — lấp khoảng trống giữa icon và chữ. */}
+              <CollabArt kind={s.art} className="perks-art pointer-events-none absolute right-2 top-2 aspect-square h-[46%]" />
               <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface-strong text-2xl transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
                 {s.icon}
               </span>

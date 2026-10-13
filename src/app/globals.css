@@ -303,6 +303,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
      trên cùng thẻ không giành nhau `transform`. Khoảng cuộn từng thẻ = biến CSS do landing.mapper tính.
    - Vạch tiến trình nhảy theo số thẻ đã vào (JS đặt --perks-fill) và trượt êm 1s. */
 .perks-stage { padding-top: 6rem; }
+.perks-art { display: none; }
 @media (min-width: 768px) { .perks-stage { padding-top: 8rem; } }
 .perks-line { position: relative; height: 2px; border-radius: 9999px; background: var(--color-line-strong); overflow: clip; }
 .perks-line-fill {
@@ -367,6 +368,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
         border-color: var(--color-line-strong);
       }
       .perks-slot > .glass > h3 { margin-top: auto; padding-top: 1.25rem; }
+      .perks-art { display: block; }
       /* Màn thấp (iPhone SE 667): thẻ thấp thêm để nhãn "HỢP TÁC" không chui dưới header. */
       @media (max-height: 700px) { .perks-slot > .glass { min-height: min(84vw, 22rem, 34svh); } }
     }
