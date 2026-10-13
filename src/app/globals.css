@@ -328,6 +328,9 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       animation-fill-mode: both;
       animation-timing-function: cubic-bezier(.5,1,.89,1);
     }
+    /* Tắt "nhấc 6px khi rê chuột" lúc ghim: thẻ trượt qua dưới con trỏ đứng yên → hover bật/tắt liên tục →
+       thẻ nhảy lên xuống trong lúc đang vào (chỉ thấy trên máy có chuột; headless báo hover:none nên test không thấy). */
+    .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
       .perks { height: calc(100svh + var(--perks-dk-run)); }
       .perks-slot {
@@ -356,7 +359,9 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   }
 }
 @keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
-@keyframes perks-slide-in { from { translate: calc(100% + 16px) 0; } to { translate: 0 0; } }
+/* Vào từ MÉP MÀN (như growx), không phải mép thẻ: thẻ rộng tối đa 28rem nằm giữa — ở màn 768–1023 mà chỉ dời
+   100% + 16px thì thẻ chờ vẫn lộ bên phải. Dời nửa màn + nửa thẻ + 16px ⇒ mép trái thẻ luôn ngoài màn. */
+@keyframes perks-slide-in { from { translate: calc(50vw + 50% + 16px) 0; } to { translate: 0 0; } }
 @keyframes perks-fade-out { from { opacity: 1; scale: 1; } to { opacity: 0; scale: 0.92; } }
 @keyframes perks-none { from { opacity: 1; } to { opacity: 1; } }
 
