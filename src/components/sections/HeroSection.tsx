@@ -15,7 +15,7 @@ const ORBIT_SLOTS = [
 
 export function HeroSection() {
   return (
-    <section id="top" data-pause-offscreen aria-labelledby="hero-title" className="relative px-4 pb-20 pt-36 md:pb-28 md:pt-44">
+    <section id="top" data-pause-offscreen aria-labelledby="hero-title" className="relative px-4 pb-20 pt-36 lg:pb-28 lg:pt-44">
       <div className="mx-auto grid max-w-6xl items-center gap-14 lg:grid-cols-[1.15fr_0.85fr]">
         <div>
           <p className="mb-6 inline-flex animate-pop items-center gap-2 rounded-full border border-line bg-surface px-4 py-1.5 text-sm text-muted">
@@ -26,7 +26,7 @@ export function HeroSection() {
             {CHANNELS.length} kênh đang hoạt động mỗi ngày
           </p>
 
-          <h1 id="hero-title" className="font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-balance sm:text-5xl lg:text-6xl">
+          <h1 id="hero-title" className="font-display text-4xl font-extrabold leading-[1.08] tracking-tight text-balance lg:text-6xl">
             {HERO_TITLE.lead} <span className="text-gradient">{HERO_TITLE.highlight}</span>
           </h1>
 

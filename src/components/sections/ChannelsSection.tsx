@@ -5,7 +5,7 @@ import { ChannelCard } from "./ChannelCard";
 
 export function ChannelsSection() {
   return (
-    <section id="kenh" data-pause-offscreen aria-labelledby="kenh-title" className="px-4 py-24 md:py-32">
+    <section id="kenh" data-pause-offscreen aria-labelledby="kenh-title" className="px-4 py-24 lg:py-32">
       <div className="mx-auto max-w-6xl">
         <SectionHeading
           id="kenh-title"
@@ -17,7 +17,7 @@ export function ChannelsSection() {
           }
           description="Theo dõi kênh hợp với bạn nhất — hoặc nhắn tin trực tiếp cho page nếu cần hỏi gì."
         />
-        <ul className="grid gap-6 md:grid-cols-2">
+        <ul className="grid gap-6 lg:grid-cols-2">
           {CHANNELS.map((c, i) => (
             // min-w-0: ô lưới mặc định không co nhỏ hơn nội dung → tên kênh dài đẩy cả trang tràn ngang trên điện thoại.
             <li key={c.key} className="min-w-0">

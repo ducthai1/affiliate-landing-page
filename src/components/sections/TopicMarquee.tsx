@@ -16,7 +16,7 @@ export function TopicMarquee() {
           {[0, 1].map((copy) => (
             <div key={copy} className={SET_CLASS}>
               {topics.map((t, i) => (
-                <span key={i} className="whitespace-nowrap font-display text-lg font-semibold text-fg/70 md:text-2xl">
+                <span key={i} className="whitespace-nowrap font-display text-lg font-semibold text-fg/70 lg:text-2xl">
                   {t}
                   <span className="ml-10 text-brand">✦</span>
                 </span>

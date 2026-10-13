@@ -4,9 +4,9 @@ import { CHANNELS, channelPageUrl } from "@/features/channels";
 
 export function SiteFooter() {
   return (
-    <footer className="relative mt-10 border-t border-line px-4 pb-10 pt-16">
+    <footer data-footer className="relative mt-10 border-t border-line px-4 pb-10 pt-16">
       <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent" />
-      <div className="mx-auto grid max-w-6xl gap-10 sm:grid-cols-2 md:grid-cols-[1.4fr_1fr_1fr_1fr]">
+      <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
           <p className="font-display text-xl font-bold">🏡 {SITE.name}</p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{SITE.description}</p>

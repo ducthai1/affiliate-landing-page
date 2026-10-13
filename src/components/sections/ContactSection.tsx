@@ -8,15 +8,15 @@ import { ContactForm } from "./ContactForm";
 
 export function ContactSection() {
   return (
-    <section id="lien-he" data-pause-offscreen aria-labelledby="lien-he-title" className="px-4 py-24 md:py-32">
+    <section id="lien-he" data-pause-offscreen aria-labelledby="lien-he-title" className="px-4 py-24 lg:py-32">
       <Reveal className="mx-auto max-w-6xl">
         <div className="ring-conic glass grid overflow-hidden rounded-[2rem] lg:grid-cols-[0.9fr_1.1fr]">
-          <aside className="relative overflow-hidden border-b border-line p-8 md:p-12 lg:border-b-0 lg:border-r">
+          <aside className="relative overflow-hidden border-b border-line p-8 lg:p-12 lg:border-b-0 lg:border-r">
             <div aria-hidden className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-brand/30 blur-3xl" />
             <div aria-hidden className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-brand-2/20 blur-3xl" />
             <div className="relative">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-3">Liên hệ</p>
-              <h2 id="lien-he-title" className="mt-3 font-display text-3xl font-bold leading-tight text-balance md:text-4xl">
+              <h2 id="lien-he-title" className="mt-3 font-display text-3xl font-bold leading-tight text-balance lg:text-4xl">
                 Hợp tác, hỏi đáp hay <span className="text-gradient">chỉ là ghé chào</span>?
               </h2>
               <p className="mt-4 leading-relaxed text-muted">
@@ -55,7 +55,7 @@ export function ContactSection() {
             </div>
           </aside>
 
-          <div className="relative p-8 md:p-12">
+          <div className="relative p-8 lg:p-12">
             <ContactForm />
           </div>
         </div>

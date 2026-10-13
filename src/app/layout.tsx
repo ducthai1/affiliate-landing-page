@@ -2,6 +2,9 @@ import type { Metadata, Viewport } from "next";
 import type { ReactNode } from "react";
 import { Be_Vietnam_Pro } from "next/font/google";
 import { SITE } from "@/config/site.const";
+import { AutoScaleWrapper } from "@/components/layout/AutoScaleWrapper";
+import { IpadPortraitViewport } from "@/components/layout/IpadPortraitViewport";
+import { AuroraBackground } from "@/components/motion/AuroraBackground";
 import { ViewportEffects } from "@/components/motion/ViewportEffects";
 import "./globals.css";
 
@@ -47,7 +50,10 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <noscript>
           <style>{"[data-reveal]{opacity:1!important;transform:none!important}"}</style>
         </noscript>
-        {children}
+        {/* NGOÀI canvas phóng: nền cố định phủ màn (fixed bên trong canvas transform sẽ bám canvas chứ không bám màn). */}
+        <AuroraBackground />
+        <IpadPortraitViewport />
+        <AutoScaleWrapper>{children}</AutoScaleWrapper>
         <ViewportEffects />
       </body>
     </html>

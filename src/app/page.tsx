@@ -1,5 +1,4 @@
 import { buildJsonLd, serializeJsonLd } from "@/features/seo/seo.mapper";
-import { AuroraBackground } from "@/components/motion/AuroraBackground";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
 import { ChannelsSection } from "@/components/sections/ChannelsSection";
@@ -13,7 +12,6 @@ export default function HomePage() {
   return (
     <>
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: serializeJsonLd(buildJsonLd()) }} />
-      <AuroraBackground />
       <SiteHeader />
       <main>
         <HeroSection />

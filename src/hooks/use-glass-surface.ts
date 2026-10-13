@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useId, useRef, useState, useSyncExternalStore } from "react";
+import { useEffect, useId, useState, useSyncExternalStore } from "react";
 import { barDisplacementMap, removeGlassFilter, upsertGlassFilter, type GlassParams } from "@/lib/glass-filter";
 
 // Thông số Glass của navbar growx-fe (Figma: Refraction 80 · Depth 20 · Dispersion 50 · Frost 4),
@@ -19,22 +19,25 @@ interface Options extends GlassParams {
   topFactor?: number;
 }
 
-/** Gắn hiệu ứng kính khúc xạ (bản đồ thanh của growx-fe) cho một khối chữ nhật. Trả [ref, giá trị backdrop-filter | undefined]. */
+/**
+ * Gắn hiệu ứng kính khúc xạ (bản đồ thanh của growx-fe) cho một khối chữ nhật. Trả [callback ref, giá trị
+ * backdrop-filter | undefined]. Callback ref (không phải useRef): header được dời sang portal sau khi mount → phần tử
+ * đổi, hook phải đo lại phần tử MỚI (ref thường + effect chạy 1 lần thì đo mãi phần tử cũ đã tháo → kính không bật).
+ */
 export function useGlassSurface<T extends HTMLElement>({ enabled = true, topFactor = 0.2, ...params }: Options = {}) {
   const id = `glass-${useId().replace(/[^a-zA-Z0-9_-]/g, "")}`;
-  const ref = useRef<T>(null);
+  const [el, setEl] = useState<T | null>(null);
   const [size, setSize] = useState({ width: 0, height: 0 });
   const chromium = useSyncExternalStore(noopSubscribe, isChromium, () => false);
   const { refraction, depth, dispersion, frost } = { ...DEFAULTS, ...params };
 
   // ResizeObserver tự gọi lại lần đầu khi bắt đầu quan sát → không cần đọc kích thước đồng bộ.
   useEffect(() => {
-    const el = ref.current;
     if (!el) return;
     const ro = new ResizeObserver(() => setSize({ width: el.offsetWidth, height: el.offsetHeight }));
     ro.observe(el);
     return () => ro.disconnect();
-  }, []);
+  }, [el]);
 
   const W = Math.round(size.width);
   const H = Math.round(size.height);
@@ -48,5 +51,5 @@ export function useGlassSurface<T extends HTMLElement>({ enabled = true, topFact
     return () => removeGlassFilter(id);
   }, [active, W, H, topFactor, refraction, depth, dispersion, frost, id]);
 
-  return [ref, active ? `url(#${id})` : undefined] as const;
+  return [setEl, active ? `url(#${id})` : undefined] as const;
 }

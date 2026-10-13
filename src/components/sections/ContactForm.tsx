@@ -26,7 +26,7 @@ export function ContactForm() {
 
       <fieldset>
         <legend className="mb-3 text-sm font-semibold text-fg">Bạn cần gì?</legend>
-        <div className="grid gap-3 sm:grid-cols-2">
+        <div className="grid gap-3 lg:grid-cols-2">
           {CONTACT_TOPICS.map((t) => (
             <label key={t.value} className="choice glass relative flex cursor-pointer items-start gap-3 rounded-2xl p-4">
               <input
@@ -51,7 +51,7 @@ export function ContactForm() {
         {f.errors.topic && <p role="alert" className="mt-2 animate-pop pl-2 text-xs font-medium text-danger">{f.errors.topic}</p>}
       </fieldset>
 
-      <div className="grid gap-4 sm:grid-cols-2">
+      <div className="grid gap-4 lg:grid-cols-2">
         <FloatingField
           id="contact-name"
           name={F.name}

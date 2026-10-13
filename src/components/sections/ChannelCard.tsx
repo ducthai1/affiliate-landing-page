@@ -25,7 +25,7 @@ export function ChannelCard({ channel }: Props) {
       id={channelAnchorId(channel)}
       aria-labelledby={`${channelAnchorId(channel)}-name`}
       {...tilt}
-      className="spotlight glass group flex h-full flex-col overflow-hidden rounded-3xl p-6 md:p-8"
+      className="spotlight glass group flex h-full flex-col overflow-hidden rounded-3xl p-6 lg:p-8"
       style={{ "--accent": accent, "--accent-2": accent2 } as CSSProperties}
     >
       {/* quầng màu kênh ở góc — -z-10: nằm dưới nội dung + dưới lớp link phủ thẻ */}
@@ -51,7 +51,7 @@ export function ChannelCard({ channel }: Props) {
           <p className="text-xs font-semibold uppercase tracking-[0.18em] text-[var(--accent)]">
             {channel.emoji} {channel.niche}
           </p>
-          <h3 id={`${channelAnchorId(channel)}-name`} className="mt-1 font-display text-xl font-bold leading-tight text-balance break-words md:text-2xl">
+          <h3 id={`${channelAnchorId(channel)}-name`} className="mt-1 font-display text-xl font-bold leading-tight text-balance break-words lg:text-2xl">
             <a
               href={channelPageUrl(channel)}
               target="_blank"
@@ -75,7 +75,7 @@ export function ChannelCard({ channel }: Props) {
         ))}
       </ul>
 
-      <div className="relative z-10 mt-7 flex flex-col gap-3 sm:flex-row">
+      <div className="relative z-10 mt-7 flex flex-col gap-3 lg:flex-row">
         <a
           href={channelPageUrl(channel)}
           target="_blank"

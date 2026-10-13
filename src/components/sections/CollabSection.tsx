@@ -10,7 +10,7 @@ const PIN_LAYOUT = buildCollabPinLayout(COLLAB_SERVICES.length);
 
 export function CollabSection() {
   return (
-    <section id="hop-tac" data-pause-offscreen aria-labelledby="hop-tac-title" className="pb-24 md:pb-32">
+    <section id="hop-tac" data-pause-offscreen aria-labelledby="hop-tac-title" className="pb-24 lg:pb-32">
       <CollabPin
         layout={PIN_LAYOUT}
         heading={
@@ -38,11 +38,12 @@ export function CollabSection() {
                 aria-hidden
                 className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-3 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
-              {/* Hình minh hoạ: chỉ hiện ở thẻ vuông (chồng bài mobile) — lấp khoảng trống giữa icon và chữ. */}
-              <CollabArt kind={s.art} className="perks-art pointer-events-none absolute right-2 top-2 aspect-square h-[46%]" />
               <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface-strong text-2xl transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
                 {s.icon}
               </span>
+              {/* Hình minh hoạ: chỉ hiện ở thẻ vuông (chồng bài mobile), nằm GIỮA khoảng trống icon ↔ tiêu đề
+                  (phần tử flex co giãn, SVG tự canh giữa trong ô của nó). */}
+              <CollabArt kind={s.art} className="perks-art pointer-events-none" />
               <h3 className="mt-5 font-display text-lg font-bold">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
             </div>
@@ -54,24 +55,25 @@ export function CollabSection() {
       <div className="mx-auto max-w-6xl">
         {/* 3 bước + vạch nối sáng dần theo vị trí cuộn (CSS scroll-driven, xem `.steps-*` trong globals.css).
             Mobile: cột dọc, vạch dọc giữa các vòng số. Desktop: 3 cột, vạch ngang nối tâm các vòng. */}
-        <ol className="mt-16 grid gap-8 md:grid-cols-3 md:gap-6">
+        <ol className="mt-16 grid gap-8 lg:grid-cols-3 lg:gap-6">
           {COLLAB_STEPS.map((step, i) => (
             <li key={step.title} className="relative">
               {i < COLLAB_STEPS.length - 1 && (
                 <span
                   aria-hidden
-                  className="steps-seg absolute left-6 top-12 bottom-[-2rem] w-px md:left-[calc(50%+1.5rem)] md:right-[-50%] md:top-6 md:bottom-auto md:h-px md:w-auto"
+                  data-scroll-anchor
+                  className="steps-seg absolute left-6 top-12 bottom-[-2rem] w-px lg:left-[calc(50%+1.5rem)] lg:right-[-50%] lg:top-6 lg:bottom-auto lg:h-px lg:w-auto"
                 >
                   <span className="steps-seg-fill" />
                 </span>
               )}
-              <Reveal delay={i * 120} className="flex items-start gap-4 md:flex-col md:items-center md:gap-0 md:text-center">
-                <span className="steps-dot relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink font-display text-lg font-bold">
+              <Reveal delay={i * 120} className="flex items-start gap-4 lg:flex-col lg:items-center lg:gap-0 lg:text-center">
+                <span data-scroll-anchor className="steps-dot relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink font-display text-lg font-bold">
                   <span className="absolute inset-0 rounded-full bg-gradient-to-br from-brand to-brand-2 opacity-30 blur-md" />
                   <span className="relative">{i + 1}</span>
                 </span>
-                <div className="pt-2.5 md:pt-0">
-                  <h3 className="font-display text-lg font-bold md:mt-4">{step.title}</h3>
+                <div className="pt-2.5 lg:pt-0">
+                  <h3 className="font-display text-lg font-bold lg:mt-4">{step.title}</h3>
                   <p className="mt-1 max-w-xs text-sm text-muted">{step.body}</p>
                 </div>
               </Reveal>

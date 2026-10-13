@@ -5,7 +5,7 @@ import { SectionHeading } from "@/components/ui/SectionHeading";
 
 export function FaqSection() {
   return (
-    <section id="hoi-dap" aria-labelledby="hoi-dap-title" className="px-4 py-24 md:py-32">
+    <section id="hoi-dap" aria-labelledby="hoi-dap-title" className="px-4 py-24 lg:py-32">
       <div className="mx-auto max-w-3xl">
         <SectionHeading id="hoi-dap-title" eyebrow="Hỏi đáp" title="Câu hỏi thường gặp" />
         <div className="space-y-3">

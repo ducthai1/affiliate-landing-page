@@ -2,7 +2,6 @@ import Link from "next/link";
 import type { ReactNode } from "react";
 import { LEGAL_LINKS, SITE } from "@/config/site.const";
 import type { LegalDoc } from "@/features/legal/legal.type";
-import { AuroraBackground } from "@/components/motion/AuroraBackground";
 import { Reveal } from "@/components/motion/Reveal";
 import { SiteFooter } from "@/components/layout/SiteFooter";
 import { SiteHeader } from "@/components/layout/SiteHeader";
@@ -32,9 +31,8 @@ export function LegalPage({ doc }: Props) {
 
   return (
     <>
-      <AuroraBackground />
       <SiteHeader />
-      <main className="px-4 pb-24 pt-36 md:pt-44">
+      <main className="px-4 pb-24 pt-36 lg:pt-44">
         <div className="mx-auto max-w-5xl">
           <nav aria-label="Breadcrumb" className="mb-6 text-sm text-subtle">
             <Link href="/" className="transition-colors hover:text-fg">
@@ -45,7 +43,7 @@ export function LegalPage({ doc }: Props) {
           </nav>
 
           <header data-pause-offscreen className="mb-12 animate-pop">
-            <h1 className="font-display text-4xl font-extrabold tracking-tight md:text-5xl">
+            <h1 className="font-display text-4xl font-extrabold tracking-tight lg:text-5xl">
               <span className="text-gradient">{doc.title}</span>
             </h1>
             <p className="mt-3 text-sm text-subtle">Cập nhật lần cuối: {doc.updatedAt}</p>
@@ -53,8 +51,9 @@ export function LegalPage({ doc }: Props) {
           </header>
 
           <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
-            <aside className="hidden lg:block">
-              <nav aria-label="Mục lục" className="sticky top-28">
+            {/* data-pin-top = 112 = top 7rem của `.legal-toc` (globals.css) — giữ hai số khớp nhau */}
+            <aside data-scroll-anchor="pin" data-pin-top="112" className="hidden lg:block">
+              <nav data-pin-stage aria-label="Mục lục" className="legal-toc">
                 <p className="mb-3 text-xs font-semibold uppercase tracking-[0.2em] text-subtle">Mục lục</p>
                 <ol className="space-y-1 border-l border-line">
                   {doc.sections.map((s) => (
@@ -73,8 +72,8 @@ export function LegalPage({ doc }: Props) {
 
             <article className="space-y-5">
               {doc.sections.map((s) => (
-                <Reveal key={s.id} as="section" className="glass scroll-mt-28 rounded-3xl p-6 md:p-8">
-                  <h2 id={s.id} className="scroll-mt-28 font-display text-xl font-bold md:text-2xl">
+                <Reveal key={s.id} as="section" className="glass scroll-mt-28 rounded-3xl p-6 lg:p-8">
+                  <h2 id={s.id} className="scroll-mt-28 font-display text-xl font-bold lg:text-2xl">
                     {s.heading}
                   </h2>
                   <div className="mt-4 space-y-3 leading-relaxed text-muted">
@@ -97,7 +96,7 @@ export function LegalPage({ doc }: Props) {
               ))}
 
               {doc.englishSummary && (
-                <Reveal as="section" className="rounded-3xl border border-line p-6 md:p-8" >
+                <Reveal as="section" className="rounded-3xl border border-line p-6 lg:p-8" >
                   <h2 lang="en" className="font-display text-lg font-bold">
                     English summary
                   </h2>

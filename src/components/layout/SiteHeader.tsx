@@ -1,17 +1,29 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type ReactNode } from "react";
+import { createPortal } from "react-dom";
+import { BASE_MOBILE_WIDTH, BASE_WIDTH } from "@/config/screen.const";
 import { NAV_ITEMS, SITE } from "@/config/site.const";
 import { CloseIcon, MenuIcon } from "@/components/ui/Icons";
+import { useAutoScale } from "@/hooks/use-auto-scale";
 import { useGlassSurface } from "@/hooks/use-glass-surface";
+import { useHasMounted } from "@/hooks/use-has-mounted";
+import { portalScaleStyle } from "@/lib/render-engine";
 
 const SCROLLED_AFTER_PX = 24;
 // Đúng thông số navbar growx-fe (Figma: Refraction 80 · Depth 20 · Dispersion 50 · Frost 4, mép trên 0.2×).
 // Đừng tăng Dispersion / giảm Frost / thêm saturate: tán sắc cầu vồng ở mép bị rực, gây chói mắt (user chốt 08/10).
 const HEADER_GLASS = { refraction: 80, depth: 20, dispersion: 50, frost: 4, topFactor: 0.2 };
 
+// Header nằm NGOÀI canvas AutoScale (giống growx-fe): `fixed` bên trong canvas `transform` (Safari) sẽ bám canvas
+// rồi trôi theo trang. Trước khi mount render tại chỗ (có trong HTML cho SEO, nhánh zoom vẫn đúng); sau mount
+// portal ra <body>, rộng đúng base (1440 | 390) rồi phóng bằng `zoom` (Blink) / transform (WebKit) theo CÙNG hệ số
+// với trang. Khung <header> để pointer-events-none: transform không thu nhỏ hộp layout, chỉ phần vẽ nhận click.
 export function SiteHeader() {
+  const mounted = useHasMounted();
+  const { scale, isMobile } = useAutoScale(BASE_WIDTH, BASE_MOBILE_WIDTH);
+  const base = isMobile ? BASE_MOBILE_WIDTH : BASE_WIDTH;
   const [scrolled, setScrolled] = useState(false);
   const [open, setOpen] = useState(false);
   const solid = scrolled || open;
@@ -40,21 +52,25 @@ export function SiteHeader() {
     return () => window.removeEventListener("keydown", onKey);
   }, [open]);
 
-  return (
+  const node: ReactNode = (
     <>
-    {/* Lớp tối phủ trang khi mở menu mobile: làm nội dung phía sau lùi xuống, chạm vào là đóng. */}
+    {/* Lớp tối phủ trang khi mở menu mobile: phủ ĐÚNG cả màn (không phóng), chạm vào là đóng. */}
     <div
       aria-hidden
       onClick={() => setOpen(false)}
-      className={`fixed inset-0 z-40 bg-ink/70 backdrop-blur-sm transition-opacity duration-300 md:hidden ${
+      className={`fixed inset-0 z-40 bg-ink/70 backdrop-blur-sm transition-opacity duration-300 lg:hidden ${
         open ? "opacity-100" : "pointer-events-none opacity-0"
       }`}
     />
-    <header className="fixed inset-x-0 top-0 z-50 px-4 pt-4">
+    <header
+      className="pointer-events-none fixed left-0 top-0 z-50"
+      style={{ width: mounted ? base * scale : "100%" }}
+    >
+      <div className="px-4 pt-4" style={mounted ? { width: base, ...portalScaleStyle(scale) } : undefined}>
       <div
         ref={barRef}
         style={backdrop ? { backdropFilter: backdrop, WebkitBackdropFilter: backdrop } : undefined}
-        className={`mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-3 transition-all duration-500 md:px-6 ${
+        className={`pointer-events-auto mx-auto flex max-w-6xl items-center justify-between rounded-2xl px-4 py-3 transition-all duration-500 lg:px-6 ${
           open ? "glass glass-menu" : solid ? "glass glass-blur shadow-[0_10px_40px_-15px_rgb(0_0_0/0.8)]" : "border border-transparent"
         }`}
       >
@@ -65,7 +81,7 @@ export function SiteHeader() {
           <span className="font-display text-lg font-bold tracking-tight">{SITE.name}</span>
         </Link>
 
-        <nav aria-label="Điều hướng chính" className="hidden md:block">
+        <nav aria-label="Điều hướng chính" className="hidden lg:block">
           <ul className="flex items-center gap-1">
             {NAV_ITEMS.map((item) => (
               <li key={item.href}>
@@ -81,12 +97,12 @@ export function SiteHeader() {
         </nav>
 
         <div className="flex items-center gap-2">
-          <Link href="/#lien-he" className="btn-primary hidden rounded-full px-5 py-2.5 text-sm font-semibold text-white sm:inline-flex">
+          <Link href="/#lien-he" className="btn-primary hidden rounded-full px-5 py-2.5 text-sm font-semibold text-white lg:inline-flex">
             Hợp tác ngay
           </Link>
           <button
             type="button"
-            className="grid h-10 w-10 place-items-center rounded-xl border border-line text-fg md:hidden"
+            className="grid h-10 w-10 place-items-center rounded-xl border border-line text-fg lg:hidden"
             aria-label={open ? "Đóng menu" : "Mở menu"}
             aria-expanded={open}
             aria-controls="mobile-nav"
@@ -100,8 +116,8 @@ export function SiteHeader() {
       <nav
         id="mobile-nav"
         aria-label="Điều hướng di động"
-        className={`glass glass-menu mx-auto mt-2 max-w-6xl overflow-hidden rounded-2xl transition-all duration-500 md:hidden ${
-          open ? "max-h-96 opacity-100" : "pointer-events-none max-h-0 border-transparent opacity-0"
+        className={`glass glass-menu mx-auto mt-2 max-w-6xl overflow-hidden rounded-2xl transition-all duration-500 lg:hidden ${
+          open ? "pointer-events-auto max-h-96 opacity-100" : "pointer-events-none max-h-0 border-transparent opacity-0"
         }`}
       >
         <ul className="divide-y divide-line p-2">
@@ -123,7 +139,7 @@ export function SiteHeader() {
             </li>
           ))}
         </ul>
-        <div className="px-4 pb-4 pt-1 sm:hidden">
+        <div className="px-4 pb-4 pt-1">
           <Link
             href="/#lien-he"
             onClick={() => setOpen(false)}
@@ -134,7 +150,10 @@ export function SiteHeader() {
           </Link>
         </div>
       </nav>
+      </div>
     </header>
     </>
   );
+
+  return mounted ? createPortal(node, document.body) : node;
 }

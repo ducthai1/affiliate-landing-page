@@ -71,4 +71,8 @@ export const COLLAB_PIN = {
   // Mobile ngắn hơn growx (70/30): ghim 240vh trên điện thoại = vuốt mãi mà nội dung đứng yên → cảm giác ì (14/10).
   mobileStepVh: 45,
   mobileHoldVh: 20,
+  // Chỉ ghim khi màn còn ĐỦ CAO tính theo px canvas (AutoScale): tiêu đề + vạch + thẻ phải nằm trọn trong khung ghim.
+  // Ngưỡng cố định (không đo bố cục đang hiện) ⇒ không bật/tắt qua lại. Thấp hơn → danh sách tĩnh (vd iPad dọc).
+  minCanvasHeightDesktop: 700,
+  minCanvasHeightMobile: 600,
 } as const;

@@ -62,8 +62,11 @@
 }
 
 html {
-  scroll-behavior: smooth;
-  scroll-padding-top: 88px;
+  /* KHÔNG scroll-behavior: smooth toàn trang — trang đang trong canvas AutoScale: cuộn mượt kéo dài ~1s làm lớp
+     canvas vẽ lại từng khung → xé hình/nhấp nháy (growx-fe đã gặp). Neo menu nhảy thẳng tới mục. */
+  /* Header phóng cùng hệ số với canvas → khoảng chừa đầu trang cũng phải nhân theo. */
+  scroll-padding-top: calc(88px * var(--canvas-scale, 1));
+  background: var(--color-ink);
   color-scheme: dark;
 }
 
@@ -296,15 +299,16 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 
 /* ---------- 4 thẻ dịch vụ hợp tác: GHIM + thẻ vào theo cuộn (kiểu "Tại sao nên là GrowX" của growx-fe) ----------
    Mặc định = bố cục tĩnh (Firefox, iOS < 26, giảm chuyển động). Có scroll-driven animation thì:
-   - khung `.perks` cao thêm một quãng cuộn; `.perks-stage` sticky đứng yên suốt quãng đó (landing không có
-     AutoScale nên dùng được sticky gốc — growx phải tự ghim bằng JS vì canvas scale giết sticky);
+   - khung `.perks` cao thêm một quãng cuộn; `.perks-stage` được DỊCH XUỐNG đúng bằng quãng cuộn (animation theo
+     `scroll(root)`, mốc do lib/scroll-anchors đo) nên đứng yên trên màn. KHÔNG dùng sticky / view(): trong canvas
+     AutoScale phóng bằng transform (Safari) chúng tính bằng toạ độ chưa phóng → khung trôi, thẻ vào sớm;
    - Desktop: thẻ k trồi lên 150% → 0 (ease-out quad) trong khoảng của nó; Mobile: chồng bài — thẻ sau trượt
      vào từ phải, thẻ trước mờ + thu nhỏ 0.92. `translate` / `scale` / `opacity` là thuộc tính riêng → 2 animation
      trên cùng thẻ không giành nhau `transform`. Khoảng cuộn từng thẻ = biến CSS do landing.mapper tính.
    - Vạch tiến trình nhảy theo số thẻ đã vào (JS đặt --perks-fill) và trượt êm 1s. */
 .perks-stage { padding-top: 6rem; }
 .perks-art { display: none; }
-@media (min-width: 768px) { .perks-stage { padding-top: 8rem; } }
+@media (min-width: 1024px) { .perks-stage { padding-top: 8rem; } }
 .perks-line { position: relative; height: 2px; border-radius: 9999px; background: var(--color-line-strong); overflow: clip; }
 .perks-line-fill {
   position: absolute;
@@ -314,14 +318,18 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   transform: scaleX(var(--perks-fill, 1));
   transition: transform 1s cubic-bezier(.2,.6,.35,1);
 }
-@supports (animation-timeline: view()) {
+/* Ghim chỉ bật khi JS (usePinFit) đặt data-pin="on": trình duyệt hỗ trợ + không giảm chuyển động + màn đủ cao
+   tính theo px CANVAS. Trang nằm trong canvas AutoScale nên mọi chiều cao theo màn (svh) phải chia cho
+   --canvas-scale mới ra px canvas (zoom/transform nhân ngược lại khi vẽ). */
+@supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* inset 0: mặc định `auto` trừ scroll-padding-top 88px của <html> → thẻ chạy trước khi khung kịp ghim. */
-    .perks { --perks-fill: 0; view-timeline-name: --perks; view-timeline-inset: 0; }
-    .perks-stage {
-      position: sticky;
-      top: 0;
-      min-height: 100svh;
+    /* Quãng ghim (px cuộn): [--pin-start, --pin-start + --pin-len]; thẻ chạy ở tỉ lệ --dk-s…--dk-e (v.v.) của quãng đó. */
+    .perks[data-pin="on"] { --perks-fill: 0; }
+    .perks[data-pin="on"] .perks-stage {
+      animation: pin-follow linear both;
+      animation-timeline: scroll(root);
+      animation-range: var(--pin-start, 0px) calc(var(--pin-start, 0px) + var(--pin-len, 0px));
+      min-height: calc(100svh / var(--canvas-scale, 1));
       display: flex;
       flex-direction: column;
       justify-content: center;
@@ -329,55 +337,82 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       padding-bottom: 2rem;
       overflow: clip; /* thẻ đang nằm dưới / bên phải chờ vào không lòi ra ngoài khung */
     }
-    .perks-slot {
-      animation-timeline: --perks;
+    .perks[data-pin="on"] .perks-slot {
+      animation-timeline: scroll(root);
       animation-fill-mode: both;
       animation-timing-function: cubic-bezier(.5,1,.89,1);
     }
     /* Tắt "nhấc 6px khi rê chuột" lúc ghim: thẻ trượt qua dưới con trỏ đứng yên → hover bật/tắt liên tục →
        thẻ nhảy lên xuống trong lúc đang vào (chỉ thấy trên máy có chuột; headless báo hover:none nên test không thấy). */
-    .perks-slot > .glass { translate: none; }
+    .perks[data-pin="on"] .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
-      .perks { height: calc(100svh + var(--perks-dk-run)); }
-      .perks-slot {
+      .perks[data-pin="on"] { height: calc((100svh + var(--perks-dk-run)) / var(--canvas-scale, 1)); }
+      .perks[data-pin="on"] .perks-slot {
         animation-name: perks-rise;
-        animation-range: contain var(--dk-s) contain var(--dk-e);
+        animation-range:
+          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-s))
+          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-e));
       }
     }
     @media (max-width: 1023px) {
-      .perks { height: calc(100svh + var(--perks-mb-run)); }
-      .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); max-width: 28rem; margin-inline: auto; }
-      .perks-slot {
+      .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1)); }
+      .perks[data-pin="on"] .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); }
+      .perks[data-pin="on"] .perks-slot {
         grid-area: 1 / 1;
         animation-name: perks-slide-in, perks-fade-out;
-        animation-timeline: --perks, --perks;
-        animation-range: contain var(--in-s) contain var(--in-e), contain var(--out-s) contain var(--out-e);
+        animation-timeline: scroll(root), scroll(root);
+        animation-range:
+          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--in-s)) calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--in-e)),
+          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--out-s)) calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--out-e));
         animation-timing-function: cubic-bezier(.5,1,.89,1), linear;
       }
-      .perks-slot[data-edge="first"] { animation-name: perks-none, perks-fade-out; }
-      .perks-slot[data-edge="last"] { animation-name: perks-slide-in, perks-none; }
-      .perks-stage { padding-top: 5rem; padding-bottom: 1.5rem; }
+      .perks[data-pin="on"] .perks-slot[data-edge="first"] { animation-name: perks-none, perks-fade-out; }
+      .perks[data-pin="on"] .perks-slot[data-edge="last"] { animation-name: perks-slide-in, perks-none; }
+      .perks[data-pin="on"] .perks-stage { padding-top: 5rem; padding-bottom: 1.5rem; }
       /* Chồng bài: thẻ phải ĐẶC — kính trong suốt thì chữ thẻ dưới xuyên qua thẻ đang trượt vào, chồng chữ rối.
-         Gần vuông (user 14/10: "chữ nhật ngang quá"), chữ dồn đáy kiểu poster; màn thấp (iPhone SE) thì thấp lại
-         theo 40svh để cả tiêu đề + vạch + thẻ vẫn nằm trong khung ghim. */
-      .perks-slot > .glass {
+         Gần vuông (user 14/10: "chữ nhật ngang quá"), chữ dồn đáy kiểu poster. Cao = phần màn còn lại sau tiêu đề
+         + vạch (~31.5rem canvas), kẹp 13.5–20.5rem ⇒ màn thấp (iPhone SE) thẻ tự thấp lại, vẫn vừa khung ghim. */
+      .perks[data-pin="on"] .perks-slot > .glass {
         display: flex;
         flex-direction: column;
-        min-height: min(84vw, 22rem, 40svh);
+        min-height: clamp(13.5rem, calc(100svh / var(--canvas-scale, 1) - 31.5rem), 20.5rem);
         background: linear-gradient(160deg, color-mix(in oklab, var(--color-ink-2) 88%, var(--color-brand) 12%), var(--color-ink-2));
         border-color: var(--color-line-strong);
       }
-      .perks-slot > .glass > h3 { margin-top: auto; padding-top: 1.25rem; }
-      .perks-art { display: block; }
-      /* Màn thấp (iPhone SE 667): thẻ thấp thêm để nhãn "HỢP TÁC" không chui dưới header. */
-      @media (max-height: 700px) { .perks-slot > .glass { min-height: min(84vw, 22rem, 34svh); } }
+      /* Hình chiếm trọn khoảng trống giữa icon và tiêu đề; SVG (meet) tự canh giữa cả 2 chiều trong ô đó.
+         Lề trên = lề dưới, tiêu đề không đệm trên ⇒ tâm hình đúng giữa đáy icon và đầu chữ tiêu đề. */
+      .perks[data-pin="on"] .perks-art { display: block; flex: 1 1 0; min-height: 0; width: 100%; margin-block: 0.75rem; }
+      .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: 0; } /* bỏ mt-5 gốc: lề do hình lo, 2 phía bằng nhau */
+      /* Màn thấp (iPhone SE): khoảng trống chỉ còn ~20px → hình thành chấm nhỏ vô duyên; ẩn đi, chữ dồn đáy thẻ. */
+      @media (max-height: 700px) {
+        .perks[data-pin="on"] .perks-art { display: none; }
+        .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: auto; padding-top: 1.25rem; }
+      }
     }
   }
 }
+/* Khung ghim theo cuộn (lib/scroll-anchors): dịch xuống đúng bằng quãng đã cuộn ⇒ đứng yên trên màn.
+   --pin-travel = px CANVAS (canvas phóng nó lên đúng bằng quãng cuộn thật). */
+@keyframes pin-follow { from { translate: 0 0; } to { translate: 0 var(--pin-travel, 0px); } }
+
+/* Mục lục trang chính sách bám dưới header khi cuộn. `sticky` chỉ đúng khi canvas phóng bằng zoom (layout); nhánh
+   transform (Safari) nó tính bằng toạ độ chưa phóng → trôi (đo 14/10: lệch dần tới hàng trăm px). Có scroll-driven
+   animation thì ghim bằng `pin-follow` ở MỌI nhánh; không có thì sticky ở nhánh zoom, đứng yên ở nhánh transform. */
+.legal-toc { position: sticky; top: 7rem; }
+@supports (animation-timeline: scroll()) {
+  .legal-toc {
+    position: static;
+    animation: pin-follow linear both;
+    animation-timeline: scroll(root);
+    animation-range: var(--pin-start, 0px) calc(var(--pin-start, 0px) + var(--pin-len, 0px));
+  }
+}
+@supports not (animation-timeline: scroll()) {
+  html:not([data-canvas-strategy="zoom-cq"]) .legal-toc { position: static; }
+}
 @keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
-/* Vào từ MÉP MÀN (như growx), không phải mép thẻ: thẻ rộng tối đa 28rem nằm giữa — ở màn 768–1023 mà chỉ dời
-   100% + 16px thì thẻ chờ vẫn lộ bên phải. Dời nửa màn + nửa thẻ + 16px ⇒ mép trái thẻ luôn ngoài màn. */
-@keyframes perks-slide-in { from { translate: calc(50vw + 50% + 16px) 0; } to { translate: 0 0; } }
+/* Canvas mobile luôn rộng 390 và thẻ trải hết canvas (trừ lề 16) ⇒ dời 100% + 16px là ra ĐÚNG mép canvas = mép màn. */
+@keyframes perks-slide-in { from { translate: calc(100% + 16px) 0; } to { translate: 0 0; } }
 @keyframes perks-fade-out { from { opacity: 1; scale: 1; } to { opacity: 0; scale: 0.92; } }
 @keyframes perks-none { from { opacity: 1; } to { opacity: 1; } }
 
@@ -386,8 +421,6 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
    hoặc người bật giảm chuyển động thấy bản tĩnh đủ ý. Có hỗ trợ thì animation `both` giữ trạng thái "chưa
    sáng" tới khi cuộn tới. Chỉ animate transform / box-shadow của 5 phần tử nhỏ, chạy theo cuộn, không JS.
    `animation-timeline` phải viết SAU `animation` (shorthand reset timeline về auto). */
-/* overflow: clip, KHÔNG hidden: `hidden` biến khung thành vùng cuộn riêng → view() của vạch bám vào nó
-   (không bao giờ cuộn) thay vì trang → vạch đứng yên ở trạng thái đầy. */
 .steps-seg { background: var(--color-line-strong); overflow: clip; border-radius: 9999px; }
 .steps-seg-fill {
   position: absolute;
@@ -399,32 +432,43 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   color: var(--color-fg);
   box-shadow: 0 0 0 1px var(--color-brand-3), 0 0 28px -6px var(--color-brand);
 }
-@media (min-width: 768px) {
+@media (min-width: 1024px) {
   .steps-seg-fill {
     background: linear-gradient(90deg, var(--color-brand-3), var(--color-brand), var(--color-brand-2));
     transform-origin: left center;
   }
 }
-@supports (animation-timeline: view()) {
+/* Theo `scroll(root)` + mốc đo (lib/scroll-anchors) thay cho view() — view() lệch trong canvas phóng bằng transform.
+   cover f = lúc phần tử đã đi được tỉ lệ f của quãng [mép trên chạm đáy màn → mép dưới chạm đỉnh màn] (như view()). */
+@supports (animation-timeline: scroll()) {
+  .steps-seg, .steps-dot {
+    --cover-0: calc(var(--doc-top, 0px) - var(--vp-h, 0px));
+    --cover-len: calc(var(--vp-h, 0px) + var(--doc-h, 0px));
+  }
   /* Mobile (cột dọc): mỗi vòng / mỗi vạch sáng khi CHÍNH nó đi qua khoảng 75% → 50% chiều cao màn. */
   .steps-seg-fill {
     animation: steps-fill-y linear both;
-    animation-timeline: view();
-    animation-range: cover 26% cover 52%;
+    animation-timeline: scroll(root);
+    --from: 0.26;
+    --to: 0.52;
   }
   .steps-dot {
     animation: steps-dot-on linear both;
-    animation-timeline: view();
-    animation-range: cover 22% cover 30%;
+    animation-timeline: scroll(root);
+    --from: 0.22;
+    --to: 0.30;
+  }
+  .steps-seg-fill, .steps-dot {
+    animation-range: calc(var(--cover-0) + var(--cover-len) * var(--from)) calc(var(--cover-0) + var(--cover-len) * var(--to));
   }
   /* Desktop (3 vòng cùng một hàng → cùng vị trí cuộn): tách nhịp bằng các khoảng range nối tiếp. */
-  @media (min-width: 768px) {
+  @media (min-width: 1024px) {
     .steps-seg-fill { animation-name: steps-fill-x; }
-    li:nth-child(1) .steps-dot { animation-range: cover 16% cover 20%; }
-    li:nth-child(1) .steps-seg-fill { animation-range: cover 20% cover 34%; }
-    li:nth-child(2) .steps-dot { animation-range: cover 32% cover 36%; }
-    li:nth-child(2) .steps-seg-fill { animation-range: cover 36% cover 50%; }
-    li:nth-child(3) .steps-dot { animation-range: cover 48% cover 52%; }
+    li:nth-child(1) .steps-dot { --from: 0.16; --to: 0.20; }
+    li:nth-child(1) .steps-seg-fill { --from: 0.20; --to: 0.34; }
+    li:nth-child(2) .steps-dot { --from: 0.32; --to: 0.36; }
+    li:nth-child(2) .steps-seg-fill { --from: 0.36; --to: 0.50; }
+    li:nth-child(3) .steps-dot { --from: 0.48; --to: 0.52; }
   }
 }
 @keyframes steps-fill-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
@@ -436,7 +480,6 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 
 /* ---------- Giảm chuyển động theo cài đặt hệ thống ---------- */
 @media (prefers-reduced-motion: reduce) {
-  html { scroll-behavior: auto; }
   *, *::before, *::after {
     animation-duration: 0.001ms !important;
     animation-iteration-count: 1 !important;

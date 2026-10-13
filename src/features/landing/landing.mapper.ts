@@ -5,13 +5,13 @@ export type PinSlotEdge = "first" | "middle" | "last";
 export interface CollabPinLayout {
   /** biến CSS cho khung ghim (chiều cao quãng cuộn desktop / mobile) */
   wrapperVars: Record<string, string>;
-  /** biến CSS cho từng thẻ: khoảng `animation-range` (theo % của quãng ghim) */
+  /** biến CSS cho từng thẻ: khoảng `animation-range` dạng TỈ LỆ (0–1) của quãng ghim — CSS nhân với quãng cuộn đo được */
   slots: { edge: PinSlotEdge; vars: Record<string, string> }[];
   /** tiến độ (0–1) mà tại đó thẻ k đã vào chỗ — JS dùng để nhảy vạch tiến trình theo số thẻ */
   doneAt: { desktop: number[]; mobile: number[] };
 }
 
-const pct = (n: number) => `${+n.toFixed(3)}%`;
+const frac = (percent: number) => String(+(percent / 100).toFixed(4));
 
 /** Tính khoảng cuộn cho từng thẻ từ COLLAB_PIN — một nguồn số cho cả CSS lẫn JS. */
 export function buildCollabPinLayout(count: number): CollabPinLayout {
@@ -23,13 +23,13 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
   const slots = Array.from({ length: count }, (_, i) => ({
     edge: (i === 0 ? "first" : i === count - 1 ? "last" : "middle") as PinSlotEdge,
     vars: {
-      "--dk-s": pct(i * dkSlot),
-      "--dk-e": pct((i + 1) * dkSlot),
+      "--dk-s": frac(i * dkSlot),
+      "--dk-e": frac((i + 1) * dkSlot),
       // mobile: thẻ i (từ thẻ thứ 2) trượt vào ở bước i; cùng lúc thẻ i−1 mờ đi
-      "--in-s": pct(Math.max(0, i - 1) * mbStep),
-      "--in-e": pct(i * mbStep),
-      "--out-s": pct(i * mbStep),
-      "--out-e": pct((i + 1) * mbStep),
+      "--in-s": frac(Math.max(0, i - 1) * mbStep),
+      "--in-e": frac(i * mbStep),
+      "--out-s": frac(i * mbStep),
+      "--out-e": frac((i + 1) * mbStep),
     },
   }));
 

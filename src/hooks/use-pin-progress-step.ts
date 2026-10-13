@@ -1,13 +1,13 @@
 "use client";
 
 import { useEffect, type RefObject } from "react";
+import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
 
-const DESKTOP_QUERY = "(min-width: 1024px)";
 const EPSILON = 1e-4;
 
 /** Trình duyệt có ghim theo cuộn không (cùng điều kiện với khối `@supports … @media` trong globals.css). */
 export function canPinWithScrollTimeline(): boolean {
-  return CSS.supports("animation-timeline: view()") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
+  return CSS.supports("animation-timeline: scroll()") && !matchMedia("(prefers-reduced-motion: reduce)").matches;
 }
 
 /**
@@ -23,14 +23,21 @@ export function usePinProgressStep<T extends HTMLElement>(
     const el = ref.current;
     if (!el || !canPinWithScrollTimeline()) return;
 
-    const desktop = matchMedia(DESKTOP_QUERY);
+    const desktop = matchMedia(DESKTOP_MEDIA_QUERY);
     let frame = 0;
     let lastStep = -1;
 
     const update = () => {
       frame = 0;
+      // Khung không ghim (màn thấp / tắt bởi usePinFit) → để CSS mặc định (vạch đầy).
+      if (el.dataset.pin !== "on") {
+        lastStep = -1;
+        return;
+      }
       const rect = el.getBoundingClientRect();
-      const run = rect.height - window.innerHeight;
+      // quãng ghim = khung ngoài − khung đứng yên (cùng cách lib/scroll-anchors tính --pin-len)
+      const stageH = el.querySelector("[data-pin-stage]")?.getBoundingClientRect().height ?? window.innerHeight;
+      const run = rect.height - stageH;
       const progress = run > 0 ? Math.min(1, Math.max(0, -rect.top / run)) : 1;
       const marks = desktop.matches ? doneAt.desktop : doneAt.mobile;
       const step = marks.filter((at) => progress >= at - EPSILON).length;
