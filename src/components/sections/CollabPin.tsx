@@ -2,6 +2,7 @@
 
 import { useRef, type CSSProperties, type ReactNode } from "react";
 import type { CollabPinLayout } from "@/features/landing/landing.mapper";
+import { usePinCardsGlide } from "@/hooks/use-pin-cards-glide";
 import { usePinFit } from "@/hooks/use-pin-fit";
 import { usePinProgressStep } from "@/hooks/use-pin-progress-step";
 
@@ -14,14 +15,16 @@ interface Props {
 
 /**
  * Khung ghim 4 thẻ dịch vụ: tiêu đề + vạch tiến trình + thẻ đứng yên trong lúc cuộn (Chrome: `sticky`; Safari:
- * khung dịch xuống bằng quãng cuộn — xem `.perks*` trong globals.css), thẻ trồi lên / trượt vào theo cuộn bằng CSS
- * scroll-driven (chạy trên compositor; mốc cuộn do lib/scroll-anchors đo — đúng cả khi canvas phóng bằng transform).
- * JS chỉ lo vạch tiến trình nhảy theo số thẻ. Không hỗ trợ / giảm chuyển động → bố cục tĩnh như cũ.
+ * khung dịch xuống bằng quãng cuộn — xem `.perks*` trong globals.css). Thẻ: mobile trượt vào theo cuộn bằng CSS
+ * scroll-driven (compositor; mốc do lib/scroll-anchors đo), desktop trồi lên theo vị trí cuộn "trôi" bằng JS
+ * (usePinCardsGlide — lăn chuột không nhảy cục). Vạch tiến trình nhảy theo số thẻ. Không hỗ trợ / giảm chuyển động
+ * → bố cục tĩnh như cũ.
  */
 export function CollabPin({ layout, heading, children }: Props) {
   const ref = useRef<HTMLDivElement>(null);
   usePinFit(ref);
   usePinProgressStep(ref, layout.doneAt);
+  usePinCardsGlide(ref, layout.desktopRanges);
 
   return (
     <div ref={ref} data-scroll-anchor="pin" className="perks" style={layout.wrapperVars as CSSProperties}>

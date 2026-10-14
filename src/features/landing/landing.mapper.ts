@@ -7,6 +7,8 @@ export interface CollabPinLayout {
   wrapperVars: Record<string, string>;
   /** biến CSS cho từng thẻ: khoảng `animation-range` dạng TỈ LỆ (0–1) của quãng ghim — CSS nhân với quãng cuộn đo được */
   slots: { edge: PinSlotEdge; vars: Record<string, string> }[];
+  /** desktop: [bắt đầu, kết thúc] (0–1 của quãng ghim) lúc thẻ k trồi lên — usePinCardsGlide vẽ bằng JS */
+  desktopRanges: (readonly [number, number])[];
   /** tiến độ (0–1) mà tại đó thẻ k đã vào chỗ — JS dùng để nhảy vạch tiến trình theo số thẻ */
   doneAt: { desktop: number[]; mobile: number[] };
 }
@@ -23,8 +25,6 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
   const slots = Array.from({ length: count }, (_, i) => ({
     edge: (i === 0 ? "first" : i === count - 1 ? "last" : "middle") as PinSlotEdge,
     vars: {
-      "--dk-s": frac(i * dkSlot),
-      "--dk-e": frac((i + 1) * dkSlot),
       // mobile: thẻ i (từ thẻ thứ 2) trượt vào ở bước i; cùng lúc thẻ i−1 mờ đi
       "--in-s": frac(Math.max(0, i - 1) * mbStep),
       "--in-e": frac(i * mbStep),
@@ -39,6 +39,7 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
       "--perks-mb-run": `${mbRunVh}vh`,
     },
     slots,
+    desktopRanges: slots.map((_, i) => [(i * dkSlot) / 100, ((i + 1) * dkSlot) / 100] as const),
     doneAt: {
       desktop: slots.map((_, i) => ((i + 1) * dkSlot) / 100),
       mobile: slots.map((_, i) => (i * mbStep) / 100),

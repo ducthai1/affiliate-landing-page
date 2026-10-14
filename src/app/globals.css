@@ -352,7 +352,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
    --canvas-scale mới ra px canvas (zoom/transform nhân ngược lại khi vẽ). */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* Quãng ghim (px cuộn): [--pin-start, --pin-start + --pin-len]; thẻ chạy ở tỉ lệ --dk-s…--dk-e (v.v.) của quãng đó. */
+    /* Quãng ghim (px cuộn): [--pin-start, --pin-start + --pin-len]; thẻ mobile chạy ở tỉ lệ --in-s…--out-e của quãng đó (desktop: JS, xem usePinCardsGlide). */
     .perks[data-pin="on"] { --perks-fill: 0; }
     .perks[data-pin="on"] .perks-stage {
       animation: pin-follow linear both;
@@ -377,12 +377,9 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     .perks[data-pin="on"] .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
       .perks[data-pin="on"] { height: calc((100svh + var(--perks-dk-run)) / var(--canvas-scale, 1)); }
-      .perks[data-pin="on"] .perks-slot {
-        animation-name: perks-rise;
-        animation-range:
-          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-s))
-          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-e));
-      }
+      /* Thẻ trồi 150% → 0 do JS vẽ theo vị trí cuộn "trôi" (usePinCardsGlide): bám 1:1 bằng CSS thì mỗi nấc lăn
+         chuột thẻ nhảy cục ~100px. Ở đây chỉ đặt trạng thái chờ để không nháy trước khung JS đầu tiên. */
+      .perks[data-pin="on"] .perks-slot { translate: 0 150%; will-change: translate; }
     }
     @media (max-width: 1023px) {
       .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1)); }
@@ -458,7 +455,6 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 @supports not (animation-timeline: scroll()) {
   html:not([data-canvas-strategy="zoom-cq"]) .legal-toc { position: static; }
 }
-@keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
 /* Canvas mobile luôn rộng 390 và thẻ trải hết canvas (trừ lề 16) ⇒ dời 100% + 16px là ra ĐÚNG mép canvas = mép màn. */
 @keyframes perks-slide-in { from { translate: calc(100% + 16px) 0; } to { translate: 0 0; } }
 /* Chỉ mờ, KHÔNG thu nhỏ: thu 0.92 làm mép trên/dưới thẻ sau chạy lên xuống ~13px mỗi lần cuộn qua lại
