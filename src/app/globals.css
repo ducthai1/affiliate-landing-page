@@ -137,36 +137,56 @@ body {
   box-shadow: 0 24px 60px -20px rgb(0 0 0 / 0.9);
 }
 
-/* ---------- Viền gradient xoay (khung form) ---------- */
-@property --angle {
-  syntax: "<angle>";
-  initial-value: 0deg;
-  inherits: false;
-}
+/* ---------- Viền gradient xoay (khung form) ----------
+   `.ring-conic` + con `<span class="ring-sweep"><span /></span>` (ContactSection). `.ring-sweep` = dải viền 1px (mask
+   chừa đúng phần padding); con bên trong = đĩa conic-gradient vuông, cạnh = đường chéo khung, XOAY bằng `rotate` ⇒
+   card đồ hoạ quay lớp đã vẽ sẵn, không vẽ lại gì. Từng làm bằng ::before + animate `--angle` của conic-gradient → vẽ
+   lại CẢ khung liên hệ mỗi khung hình (kèm 2 đốm mờ): điện thoại raster 0.35s → 4.7s; màn 3440×1440 (canvas ×2.4)
+   raster ~11s mỗi lượt cuộn qua, 8–26 khung khựng (đo 14/10, user: "scroll tới phần liên hệ cũng giật lag"). */
 .ring-conic {
   position: relative;
   isolation: isolate;
 }
-.ring-conic::before {
-  content: "";
+.ring-sweep {
   position: absolute;
   inset: -1px;
   border-radius: inherit;
   padding: 1px;
-  background: conic-gradient(from var(--angle), transparent 0 55%, var(--color-brand-3), var(--color-brand), var(--color-brand-2), transparent 95%);
+  overflow: hidden;
+  container-type: size;
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
   pointer-events: none;
   z-index: 1;
 }
-/* Xoay vệt sáng = đổi --angle mỗi khung ⇒ vẽ lại CẢ khung liên hệ mỗi khung (không lên compositor được). Trên điện
-   thoại khung đó cao ~1400px × DPR ~2.6 + 2 đốm blur-3xl ⇒ raster 0.35s → 4.7s khi cuộn tới (đo 14/10, user: "kéo tới
-   liên hệ rất lag"). Điện thoại để vệt sáng đứng yên; desktop vẫn xoay. */
-@media (min-width: 1024px) {
-  .ring-conic::before { animation: ring-rotate 6s linear infinite; }
+.ring-sweep > span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 150%;
+  width: calc(hypot(100cqw, 100cqh) + 4px);
+  aspect-ratio: 1;
+  translate: -50% -50%;
+  background: conic-gradient(transparent 0 55%, var(--color-brand-3), var(--color-brand), var(--color-brand-2), transparent 95%);
 }
-@keyframes ring-rotate { to { --angle: 360deg; } }
+/* Điện thoại để vệt sáng đứng yên: khung ở đó cao ~1400px × DPR ~2.6 → lớp quay cỡ đường chéo quá lớn cho máy yếu. */
+@media (min-width: 1024px) {
+  .ring-sweep > span { animation: ring-spin 6s linear infinite; }
+}
+@keyframes ring-spin { to { rotate: 360deg; } }
+
+/* Đốm sáng mềm = một vòng tròn 18rem làm mờ blur-3xl (64px), dựng lại bằng radial-gradient cùng dáng (mép tắt dần
+   theo erfc của vòng mờ) trong hộp 34rem = 18rem + 2 × 2 × 64px. Không có `filter` → khối chứa nó vẽ lại (rê chuột,
+   chữ gradient chạy) không phải tính lại blur 64px (×2.4 trên màn 3440 = blur ~150px). Màu: --glow + độ đậm --glow-a. */
+.glow-soft {
+  background: radial-gradient(closest-side,
+    color-mix(in oklab, var(--glow) calc(var(--glow-a) * 0.95), transparent) 0%,
+    color-mix(in oklab, var(--glow) calc(var(--glow-a) * 0.87), transparent) 26%,
+    color-mix(in oklab, var(--glow) calc(var(--glow-a) * 0.5), transparent) 53%,
+    color-mix(in oklab, var(--glow) calc(var(--glow-a) * 0.16), transparent) 76%,
+    transparent);
+}
 
 /* ---------- Nút chính: gradient + vệt sáng lướt ---------- */
 .btn-primary {
@@ -366,7 +386,12 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       padding-bottom: 2rem;
       overflow: clip; /* thẻ đang nằm dưới / bên phải chờ vào không lòi ra ngoài khung */
     }
-    html[data-canvas-strategy="zoom-cq"] .perks[data-pin="on"] .perks-stage { position: sticky; top: 0; animation: none; }
+    /* top âm = ghim theo MÉP DƯỚI khi khung cao hơn màn (--pin-overflow do lib/scroll-anchors đo; vừa màn thì 0). */
+    html[data-canvas-strategy="zoom-cq"] .perks[data-pin="on"] .perks-stage {
+      position: sticky;
+      top: calc(-1 * var(--pin-overflow, 0px));
+      animation: none;
+    }
     .perks[data-pin="on"] .perks-slot {
       animation-timeline: scroll(root);
       animation-fill-mode: both;
@@ -376,13 +401,13 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
        thẻ nhảy lên xuống trong lúc đang vào (chỉ thấy trên máy có chuột; headless báo hover:none nên test không thấy). */
     .perks[data-pin="on"] .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
-      .perks[data-pin="on"] { height: calc((100svh + var(--perks-dk-run)) / var(--canvas-scale, 1)); }
+      .perks[data-pin="on"] { height: calc((100svh + var(--perks-dk-run)) / var(--canvas-scale, 1) + var(--pin-overflow, 0px)); }
       /* Thẻ trồi 150% → 0 do JS vẽ theo vị trí cuộn "trôi" (usePinCardsGlide): bám 1:1 bằng CSS thì mỗi nấc lăn
          chuột thẻ nhảy cục ~100px. Ở đây chỉ đặt trạng thái chờ để không nháy trước khung JS đầu tiên. */
       .perks[data-pin="on"] .perks-slot { translate: 0 150%; will-change: translate; }
     }
     @media (max-width: 1023px) {
-      .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1)); }
+      .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1) + var(--pin-overflow, 0px)); }
       .perks[data-pin="on"] .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); }
       /* Thẻ k trượt vào ở bước k (translate) và mờ đi khi thẻ k+1 vào (opacity) — 2 thuộc tính khác nhau nên cả 2
          chạy trên compositor. Thẻ đầu chỉ mờ, thẻ cuối chỉ trượt: khai MỘT animation thật, KHÔNG dùng keyframes giả

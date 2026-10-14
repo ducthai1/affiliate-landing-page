@@ -12,8 +12,8 @@ export function ContactSection() {
       <Reveal className="mx-auto max-w-6xl">
         <div className="ring-conic glass grid overflow-hidden rounded-[2rem] lg:grid-cols-[0.9fr_1.1fr]">
           <aside className="relative overflow-hidden border-b border-line p-8 lg:p-12 lg:border-b-0 lg:border-r">
-            <div aria-hidden className="absolute -left-20 -top-20 h-72 w-72 rounded-full bg-brand/30 blur-3xl" />
-            <div aria-hidden className="absolute -bottom-24 right-0 h-72 w-72 rounded-full bg-brand-2/20 blur-3xl" />
+            <div aria-hidden className="glow-soft absolute -left-52 -top-52 h-[34rem] w-[34rem] [--glow-a:30%] [--glow:var(--color-brand)]" />
+            <div aria-hidden className="glow-soft absolute -bottom-56 -right-32 h-[34rem] w-[34rem] [--glow-a:20%] [--glow:var(--color-brand-2)]" />
             <div className="relative">
               <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-3">Liên hệ</p>
               <h2 id="lien-he-title" className="mt-3 font-display text-3xl font-bold leading-tight text-balance lg:text-4xl">
@@ -58,6 +58,9 @@ export function ContactSection() {
           <div className="relative p-8 lg:p-12">
             <ContactForm />
           </div>
+          <span aria-hidden className="ring-sweep">
+            <span />
+          </span>
         </div>
       </Reveal>
     </section>

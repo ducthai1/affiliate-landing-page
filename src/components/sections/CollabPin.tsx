@@ -15,7 +15,8 @@ interface Props {
 
 /**
  * Khung ghim 4 thẻ dịch vụ: tiêu đề + vạch tiến trình + thẻ đứng yên trong lúc cuộn (Chrome: `sticky`; Safari:
- * khung dịch xuống bằng quãng cuộn — xem `.perks*` trong globals.css). Thẻ: mobile trượt vào theo cuộn bằng CSS
+ * khung dịch xuống bằng quãng cuộn — xem `.perks*` trong globals.css). Màn thấp hơn khung (màn siêu rộng) → ghim theo
+ * mép dưới (`data-pin-fit`): đầu tiêu đề trượt dưới header, vạch + thẻ vẫn thấy trọn. Thẻ: mobile trượt vào theo cuộn bằng CSS
  * scroll-driven (compositor; mốc do lib/scroll-anchors đo), desktop trồi lên theo vị trí cuộn "trôi" bằng JS
  * (usePinCardsGlide — lăn chuột không nhảy cục). Vạch tiến trình nhảy theo số thẻ. Không hỗ trợ / giảm chuyển động
  * → bố cục tĩnh như cũ.
@@ -27,7 +28,7 @@ export function CollabPin({ layout, heading, children }: Props) {
   usePinCardsGlide(ref, layout.desktopRanges);
 
   return (
-    <div ref={ref} data-scroll-anchor="pin" className="perks" style={layout.wrapperVars as CSSProperties}>
+    <div ref={ref} data-scroll-anchor="pin" data-pin-fit="bottom" className="perks" style={layout.wrapperVars as CSSProperties}>
       <div data-pin-stage className="perks-stage px-4">
         <div className="mx-auto w-full max-w-6xl">
           {heading}

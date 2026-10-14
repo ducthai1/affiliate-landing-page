@@ -2,6 +2,7 @@
 
 import { useEffect, type RefObject } from "react";
 import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
+import { measurePin } from "@/lib/scroll-anchors";
 
 const EPSILON = 1e-4;
 
@@ -34,11 +35,9 @@ export function usePinProgressStep<T extends HTMLElement>(
         lastStep = -1;
         return;
       }
-      const rect = el.getBoundingClientRect();
-      // quãng ghim = khung ngoài − khung đứng yên (cùng cách lib/scroll-anchors tính --pin-len)
-      const stageH = el.querySelector("[data-pin-stage]")?.getBoundingClientRect().height ?? window.innerHeight;
-      const run = rect.height - stageH;
-      const progress = run > 0 ? Math.min(1, Math.max(0, -rect.top / run)) : 1;
+      // cùng quãng ghim với biến CSS (lib/scroll-anchors), kể cả khi ghim theo mép dưới
+      const { start, run } = measurePin(el);
+      const progress = run > 0 ? Math.min(1, Math.max(0, (window.scrollY - start) / run)) : 1;
       const marks = desktop.matches ? doneAt.desktop : doneAt.mobile;
       const step = marks.filter((at) => progress >= at - EPSILON).length;
       if (step === lastStep) return;

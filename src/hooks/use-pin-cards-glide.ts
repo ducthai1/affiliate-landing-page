@@ -2,13 +2,13 @@
 
 import { useEffect, type RefObject } from "react";
 import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
+import { measurePin } from "@/lib/scroll-anchors";
 import { createScrollGlide } from "@/lib/scroll-glide";
 import { canPinWithScrollTimeline } from "./use-pin-progress-step";
 
 /** Thẻ chờ ở dưới 150% chiều cao của chính nó rồi trồi lên chỗ (như `.perks-slot` mặc định trong globals.css). */
 const RISE_FROM_PERCENT = 150;
 const SLOT_SELECTOR = ".perks-slot";
-const STAGE_SELECTOR = "[data-pin-stage]";
 
 const clamp01 = (t: number) => Math.min(1, Math.max(0, t));
 /** ease-out quad — đường cong thẻ của demo growx đo được (cũng là cubic-bezier(.5,1,.89,1) cũ). */
@@ -31,12 +31,10 @@ export function usePinCardsGlide<T extends HTMLElement>(ref: RefObject<T | null>
 
     const glide = createScrollGlide((glideY) => {
       if (!active()) return;
-      // Đo mỗi khung từ khung NGOÀI (không bị dịch) — rẻ, và luôn đúng sau đổi bố cục / hệ số phóng.
-      const rect = el.getBoundingClientRect();
-      const stageH = el.querySelector(STAGE_SELECTOR)?.getBoundingClientRect().height ?? window.innerHeight;
-      const run = rect.height - stageH;
+      // Đo mỗi khung từ khung NGOÀI (không bị dịch) — rẻ, và luôn đúng sau đổi bố cục / hệ số phóng / ghim mép dưới.
+      const { start, run } = measurePin(el);
       if (run <= 0) return;
-      const progress = (glideY - (rect.top + window.scrollY)) / run;
+      const progress = (glideY - start) / run;
       slots().forEach((slot, k) => {
         const [from, to] = ranges[k] ?? [0, 1];
         const t = clamp01((progress - from) / (to - from || 1));

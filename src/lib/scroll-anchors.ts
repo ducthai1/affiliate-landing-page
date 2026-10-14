@@ -17,9 +17,31 @@
 //                                tính từ đỉnh màn, mặc định 0), --pin-len (quãng cuộn đứng ghim, px "range") và
 //                                --pin-travel (quãng khung ghim phải dịch xuống, px CANVAS) = cao khung ngoài − cao
 //                                [data-pin-stage]. Khung ghim dùng keyframes `pin-follow` (globals.css).
+//   + data-pin-fit="bottom"   → khung đứng yên CAO HƠN màn (màn siêu rộng 3440×1440 chỉ còn ~578 px canvas) thì ghim theo
+//                                MÉP DƯỚI: --pin-overflow (px CANVAS) = phần nhô lên khỏi đỉnh màn; khung ngoài cao thêm
+//                                đúng chừng đó và quãng ghim bắt đầu muộn hơn chừng đó → thẻ ở đáy luôn thấy trọn.
 
 const ANCHOR_SELECTOR = "[data-scroll-anchor]";
 const STAGE_SELECTOR = "[data-pin-stage]";
+
+function readCanvasScale(): number {
+  return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--canvas-scale")) || 1;
+}
+
+/**
+ * Quãng ghim theo px CUỘN THẬT (đã tính phóng): `start` = vị trí cuộn bắt đầu đứng yên, `run` = quãng đứng yên,
+ * `overflow` = px khung đứng yên nhô lên khỏi đỉnh màn khi ghim theo mép dưới (0 = vừa màn). Một công thức cho cả
+ * biến CSS ở đây lẫn hook JS (vạch tiến trình, thẻ trôi) — lệch nhau là thẻ vào sai nhịp với khung.
+ */
+export function measurePin(el: HTMLElement) {
+  const r = el.getBoundingClientRect();
+  const stageH = el.querySelector<HTMLElement>(STAGE_SELECTOR)?.getBoundingClientRect().height ?? window.innerHeight;
+  const pinTopCanvas = parseFloat(el.dataset.pinTop || "0") || 0;
+  const pinTop = pinTopCanvas ? pinTopCanvas * readCanvasScale() : 0;
+  const overflow = el.dataset.pinFit === "bottom" ? Math.max(0, stageH + pinTop - window.innerHeight) : 0;
+  // chiều cao không đổi theo translate của chính animation ghim → đo giữa chừng vẫn đúng
+  return { start: r.top + window.scrollY - pinTop + overflow, run: Math.max(0, r.height - stageH), overflow };
+}
 
 /** `zoom` thực tế áp lên phần tử (tích các tổ tiên). */
 function cssZoomOf(el: Element): number {
@@ -39,9 +61,10 @@ function setVar(el: HTMLElement, name: string, value: string) {
 function measureAll(root: Document) {
   const anchors = root.querySelectorAll<HTMLElement>(ANCHOR_SELECTOR);
   if (!anchors.length) return;
-  const canvasScale = parseFloat(getComputedStyle(root.documentElement).getPropertyValue("--canvas-scale")) || 1;
+  const canvasScale = readCanvasScale();
   const zoom = cssZoomOf(anchors[0]); // mọi mốc cùng nằm trong một canvas
   const px = (real: number) => `${Math.round((real / zoom) * 100) / 100}px`;
+  const canvasPx = (real: number) => `${Math.round((real / canvasScale) * 100) / 100}px`;
   const vp = window.innerHeight;
   anchors.forEach((el) => {
     const r = el.getBoundingClientRect();
@@ -49,13 +72,11 @@ function measureAll(root: Document) {
     setVar(el, "--doc-h", px(r.height));
     setVar(el, "--vp-h", px(vp));
     if (el.dataset.scrollAnchor !== "pin") return;
-    const pinTop = (parseFloat(el.dataset.pinTop || "0") || 0) * canvasScale;
-    setVar(el, "--pin-start", px(r.top + window.scrollY - pinTop));
-    const stage = el.querySelector<HTMLElement>(STAGE_SELECTOR);
-    // chiều cao không đổi theo translate của chính animation ghim → đo giữa chừng vẫn đúng
-    const run = Math.max(0, r.height - (stage?.getBoundingClientRect().height ?? vp));
-    setVar(el, "--pin-len", px(run));
-    setVar(el, "--pin-travel", `${Math.round((run / canvasScale) * 100) / 100}px`);
+    const pin = measurePin(el);
+    setVar(el, "--pin-start", px(pin.start));
+    setVar(el, "--pin-len", px(pin.run));
+    setVar(el, "--pin-travel", canvasPx(pin.run));
+    setVar(el, "--pin-overflow", canvasPx(pin.overflow));
   });
 }
 
