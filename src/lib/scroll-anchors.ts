@@ -2,10 +2,12 @@
 //
 // Trang nằm trong canvas phóng bằng `zoom` (Chrome) hoặc `transform: scale` (Safari). Với transform, trình duyệt
 // tính `position: sticky` và timeline `view()` bằng toạ độ CHƯA phóng trong khi vị trí cuộn là toạ độ ĐÃ phóng →
-// lệch theo hệ số phóng (đo 14/10 ở 1920px ×1.32: khung ghim trôi, thẻ vào chỗ trước khi kịp ghim). growx-fe gặp
-// đúng lỗi này và bỏ sticky. Cách ở đây (như growx): JS đo vị trí phần tử bằng px CUỘN THẬT (getBoundingClientRect
-// + scrollY — đã tính phóng), ghi ra biến CSS; hiệu ứng dùng `animation-timeline: scroll(root)` (chỉ phụ thuộc
-// scrollY) với `animation-range` tính từ các biến đó → đúng ở mọi engine, mọi hệ số phóng, mọi mức zoom.
+// lệch theo hệ số phóng (đo 14/10 ở 1920px ×1.32: khung ghim trôi, thẻ vào chỗ trước khi kịp ghim). Cách ở đây
+// (như growx): JS đo vị trí phần tử bằng px CUỘN THẬT (getBoundingClientRect + scrollY — đã tính phóng), ghi ra biến
+// CSS; hiệu ứng dùng `animation-timeline: scroll(root)` (chỉ phụ thuộc scrollY) với `animation-range` tính từ các
+// biến đó → đúng ở mọi engine, mọi hệ số phóng, mọi mức zoom.
+// Riêng việc GHIM ĐỨNG YÊN, nhánh zoom (Chrome) vẫn dùng `sticky` (globals.css): ghim bằng animation trễ 1 khung
+// hình khi cuộn ngược lên → khung "nảy". `pin-follow` chỉ dùng cho nhánh transform.
 //
 // Blink NHÂN cả px trong `animation-range` với `zoom` của phần tử khai báo (growx đo: khoảng 484→1204 chạy thành
 // 363→903 ở zoom 0.75) → mọi mốc ghi ra đã CHIA cho zoom của chính phần tử (nhánh transform: zoom = 1).

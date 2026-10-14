@@ -38,11 +38,10 @@ export function CollabSection() {
                 aria-hidden
                 className="absolute inset-x-0 -top-px h-px bg-gradient-to-r from-transparent via-brand-3 to-transparent opacity-0 transition-opacity duration-500 group-hover:opacity-100"
               />
-              <span className="grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface-strong text-2xl transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
+              <span className="perks-icon grid h-12 w-12 place-items-center rounded-2xl border border-line bg-surface-strong text-2xl transition-transform duration-500 group-hover:-rotate-6 group-hover:scale-110">
                 {s.icon}
               </span>
-              {/* Hình minh hoạ: chỉ hiện ở thẻ vuông (chồng bài mobile), nằm GIỮA khoảng trống icon ↔ tiêu đề
-                  (phần tử flex co giãn, SVG tự canh giữa trong ô của nó). */}
+              {/* Hình minh hoạ: chỉ hiện ở thẻ vuông (chồng bài mobile), là ảnh bìa tràn viền phía trên tiêu đề. */}
               <CollabArt kind={s.art} className="perks-art pointer-events-none" />
               <h3 className="mt-5 font-display text-lg font-bold">{s.title}</h3>
               <p className="mt-2 text-sm leading-relaxed text-muted">{s.body}</p>
@@ -71,6 +70,10 @@ export function CollabSection() {
                 <span data-scroll-anchor className="steps-dot relative grid h-12 w-12 shrink-0 place-items-center rounded-full bg-ink font-display text-lg font-bold">
                   <span className="absolute inset-0 rounded-full bg-gradient-to-br from-brand to-brand-2 opacity-30 blur-md" />
                   <span className="relative">{i + 1}</span>
+                  {/* trạng thái "sáng": lớp phủ hiện dần theo cuộn (opacity chạy trên compositor) */}
+                  <span aria-hidden className="steps-dot-on absolute inset-0 grid place-items-center rounded-full bg-ink">
+                    {i + 1}
+                  </span>
                 </span>
                 <div className="pt-2.5 lg:pt-0">
                   <h3 className="font-display text-lg font-bold lg:mt-4">{step.title}</h3>

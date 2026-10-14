@@ -13,9 +13,9 @@ interface Props {
 }
 
 /**
- * Khung ghim 4 thẻ dịch vụ: tiêu đề + vạch tiến trình + thẻ đứng yên trong lúc cuộn (khung dịch xuống bằng quãng
- * cuộn), thẻ trồi lên / trượt vào theo cuộn bằng CSS scroll-driven (`.perks*` trong globals.css, chạy trên
- * compositor; mốc cuộn do lib/scroll-anchors đo — đúng cả khi canvas AutoScale phóng bằng transform).
+ * Khung ghim 4 thẻ dịch vụ: tiêu đề + vạch tiến trình + thẻ đứng yên trong lúc cuộn (Chrome: `sticky`; Safari:
+ * khung dịch xuống bằng quãng cuộn — xem `.perks*` trong globals.css), thẻ trồi lên / trượt vào theo cuộn bằng CSS
+ * scroll-driven (chạy trên compositor; mốc cuộn do lib/scroll-anchors đo — đúng cả khi canvas phóng bằng transform).
  * JS chỉ lo vạch tiến trình nhảy theo số thẻ. Không hỗ trợ / giảm chuyển động → bố cục tĩnh như cũ.
  */
 export function CollabPin({ layout, heading, children }: Props) {

@@ -109,7 +109,11 @@ body {
   -webkit-background-clip: text;
   background-clip: text;
   color: transparent;
-  animation: shimmer 8s linear infinite;
+}
+/* Chữ gradient chạy = đổi background-position mỗi khung ⇒ vẽ lại mỗi khung (trace 14/10: tiêu đề + cả lớp gốc trang vẽ
+   lại 591/591 khung khi cuộn). Điện thoại để gradient đứng yên. */
+@media (min-width: 1024px) {
+  .text-gradient { animation: shimmer 8s linear infinite; }
 }
 
 /* ---------- Kính ----------
@@ -153,9 +157,14 @@ body {
   -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0);
   -webkit-mask-composite: xor;
   mask-composite: exclude;
-  animation: ring-rotate 6s linear infinite;
   pointer-events: none;
   z-index: 1;
+}
+/* Xoay vệt sáng = đổi --angle mỗi khung ⇒ vẽ lại CẢ khung liên hệ mỗi khung (không lên compositor được). Trên điện
+   thoại khung đó cao ~1400px × DPR ~2.6 + 2 đốm blur-3xl ⇒ raster 0.35s → 4.7s khi cuộn tới (đo 14/10, user: "kéo tới
+   liên hệ rất lag"). Điện thoại để vệt sáng đứng yên; desktop vẫn xoay. */
+@media (min-width: 1024px) {
+  .ring-conic::before { animation: ring-rotate 6s linear infinite; }
 }
 @keyframes ring-rotate { to { --angle: 360deg; } }
 
@@ -197,6 +206,13 @@ body {
 [data-offscreen]::after,
 [data-offscreen] ::before,
 [data-offscreen] ::after { animation-play-state: paused !important; }
+/* …trừ animation CHẠY THEO CUỘN: dừng thì đóng băng trạng thái lúc rời màn (vd vào thẳng #lien-he rồi kéo ngược lên
+   thì vòng số / thẻ còn ở trạng thái cũ tới khi kịp chạy lại). Chúng chạy trên compositor, không tốn khi khuất. */
+[data-offscreen] .perks-stage,
+[data-offscreen] .perks-slot,
+[data-offscreen] .steps-seg-fill,
+[data-offscreen] .steps-dot-on,
+[data-offscreen] .legal-toc { animation-play-state: running !important; }
 
 /* ---------- Thẻ kênh: đèn rọi theo chuột + nghiêng 3D ---------- */
 .spotlight {
@@ -299,9 +315,12 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 
 /* ---------- 4 thẻ dịch vụ hợp tác: GHIM + thẻ vào theo cuộn (kiểu "Tại sao nên là GrowX" của growx-fe) ----------
    Mặc định = bố cục tĩnh (Firefox, iOS < 26, giảm chuyển động). Có scroll-driven animation thì:
-   - khung `.perks` cao thêm một quãng cuộn; `.perks-stage` được DỊCH XUỐNG đúng bằng quãng cuộn (animation theo
-     `scroll(root)`, mốc do lib/scroll-anchors đo) nên đứng yên trên màn. KHÔNG dùng sticky / view(): trong canvas
-     AutoScale phóng bằng transform (Safari) chúng tính bằng toạ độ chưa phóng → khung trôi, thẻ vào sớm;
+   - khung `.perks` cao thêm một quãng cuộn; `.perks-stage` đứng yên trên màn suốt quãng đó:
+       · Chrome (canvas phóng bằng `zoom`): `position: sticky` — compositor tự ghim, đứng yên tuyệt đối. Ghim bằng
+         animation theo cuộn thì khi cuộn NGƯỢC LÊN khung trễ 1 khung hình (lệch 17–65px tuỳ tốc độ vuốt) ⇒
+         "nảy lên nảy xuống" (user 14/10, đo bằng screencast compositor);
+       · Safari (canvas phóng bằng `transform`): sticky tính bằng toạ độ chưa phóng → trôi ⇒ DỊCH khung xuống đúng
+         bằng quãng cuộn bằng animation `pin-follow` theo `scroll(root)`, mốc do lib/scroll-anchors đo;
    - Desktop: thẻ k trồi lên 150% → 0 (ease-out quad) trong khoảng của nó; Mobile: chồng bài — thẻ sau trượt
      vào từ phải, thẻ trước mờ + thu nhỏ 0.92. `translate` / `scale` / `opacity` là thuộc tính riêng → 2 animation
      trên cùng thẻ không giành nhau `transform`. Khoảng cuộn từng thẻ = biến CSS do landing.mapper tính.
@@ -309,6 +328,16 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 .perks-stage { padding-top: 6rem; }
 .perks-art { display: none; }
 @media (min-width: 1024px) { .perks-stage { padding-top: 8rem; } }
+/* Nền ảnh bìa: quầng màu thương hiệu + lưới chấm, mờ dần xuống đáy để liền với phần chữ. Vẽ một lần (không animation). */
+.perks-art {
+  position: relative;
+  background:
+    radial-gradient(60% 75% at 50% 45%, color-mix(in oklab, var(--color-brand) 30%, transparent), transparent 72%),
+    radial-gradient(circle at 1px 1px, color-mix(in oklab, var(--color-fg) 9%, transparent) 1px, transparent 0) 0 0 / 16px 16px,
+    linear-gradient(180deg, color-mix(in oklab, var(--color-brand-3) 16%, transparent), transparent 85%);
+  mask-image: linear-gradient(#000 78%, transparent);
+}
+.perks-art > svg { position: absolute; inset: 1rem 0.75rem 0; width: calc(100% - 1.5rem); height: calc(100% - 1rem); }
 .perks-line { position: relative; height: 2px; border-radius: 9999px; background: var(--color-line-strong); overflow: clip; }
 .perks-line-fill {
   position: absolute;
@@ -337,6 +366,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       padding-bottom: 2rem;
       overflow: clip; /* thẻ đang nằm dưới / bên phải chờ vào không lòi ra ngoài khung */
     }
+    html[data-canvas-strategy="zoom-cq"] .perks[data-pin="on"] .perks-stage { position: sticky; top: 0; animation: none; }
     .perks[data-pin="on"] .perks-slot {
       animation-timeline: scroll(root);
       animation-fill-mode: both;
@@ -357,17 +387,33 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     @media (max-width: 1023px) {
       .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1)); }
       .perks[data-pin="on"] .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); }
+      /* Thẻ k trượt vào ở bước k (translate) và mờ đi khi thẻ k+1 vào (opacity) — 2 thuộc tính khác nhau nên cả 2
+         chạy trên compositor. Thẻ đầu chỉ mờ, thẻ cuối chỉ trượt: khai MỘT animation thật, KHÔNG dùng keyframes giả
+         giữ chỗ (từng dùng `perks-none` opacity 1→1 → trùng opacity với hiệu ứng mờ → Chrome báo
+         "incompatible animations", đẩy cả thẻ về luồng chính). */
       .perks[data-pin="on"] .perks-slot {
+        --in-a: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--in-s));
+        --in-b: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--in-e));
+        --out-a: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--out-s));
+        --out-b: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--out-e));
         grid-area: 1 / 1;
         animation-name: perks-slide-in, perks-fade-out;
         animation-timeline: scroll(root), scroll(root);
-        animation-range:
-          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--in-s)) calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--in-e)),
-          calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--out-s)) calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--out-e));
+        animation-range: var(--in-a) var(--in-b), var(--out-a) var(--out-b);
         animation-timing-function: cubic-bezier(.5,1,.89,1), linear;
       }
-      .perks[data-pin="on"] .perks-slot[data-edge="first"] { animation-name: perks-none, perks-fade-out; }
-      .perks[data-pin="on"] .perks-slot[data-edge="last"] { animation-name: perks-slide-in, perks-none; }
+      .perks[data-pin="on"] .perks-slot[data-edge="first"] {
+        animation-name: perks-fade-out;
+        animation-timeline: scroll(root);
+        animation-range: var(--out-a) var(--out-b);
+        animation-timing-function: linear;
+      }
+      .perks[data-pin="on"] .perks-slot[data-edge="last"] {
+        animation-name: perks-slide-in;
+        animation-timeline: scroll(root);
+        animation-range: var(--in-a) var(--in-b);
+        animation-timing-function: cubic-bezier(.5,1,.89,1);
+      }
       .perks[data-pin="on"] .perks-stage { padding-top: 5rem; padding-bottom: 1.5rem; }
       /* Chồng bài: thẻ phải ĐẶC — kính trong suốt thì chữ thẻ dưới xuyên qua thẻ đang trượt vào, chồng chữ rối.
          Gần vuông (user 14/10: "chữ nhật ngang quá"), chữ dồn đáy kiểu poster. Cao = phần màn còn lại sau tiêu đề
@@ -379,13 +425,15 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
         background: linear-gradient(160deg, color-mix(in oklab, var(--color-ink-2) 88%, var(--color-brand) 12%), var(--color-ink-2));
         border-color: var(--color-line-strong);
       }
-      /* Hình chiếm trọn khoảng trống giữa icon và tiêu đề; SVG (meet) tự canh giữa cả 2 chiều trong ô đó.
-         Lề trên = lề dưới, tiêu đề không đệm trên ⇒ tâm hình đúng giữa đáy icon và đầu chữ tiêu đề. */
-      .perks[data-pin="on"] .perks-art { display: block; flex: 1 1 0; min-height: 0; width: 100%; margin-block: 0.75rem; }
-      .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: 0; } /* bỏ mt-5 gốc: lề do hình lo, 2 phía bằng nhau */
-      /* Màn thấp (iPhone SE): khoảng trống chỉ còn ~20px → hình thành chấm nhỏ vô duyên; ẩn đi, chữ dồn đáy thẻ. */
+      /* Hình minh hoạ = ẢNH BÌA của thẻ (user 14/10: hình nhỏ như icon, muốn "1 cái hình cho nguyên phần trống"):
+         tràn hết từ mép trên + 2 mép bên (bù padding p-6 = 1.5rem) xuống tới tiêu đề; icon nổi ở góc trên trái. */
+      .perks[data-pin="on"] .perks-art { display: block; flex: 1 1 0; min-height: 0; margin: -1.5rem -1.5rem 0.75rem; }
+      .perks[data-pin="on"] .perks-icon { position: absolute; top: 1.5rem; left: 1.5rem; z-index: 1; }
+      .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: 0; }
+      /* Màn thấp (iPhone SE): phần trống chỉ còn ~70px → ẩn hình, icon về chỗ cũ, chữ dồn đáy thẻ. */
       @media (max-height: 700px) {
         .perks[data-pin="on"] .perks-art { display: none; }
+        .perks[data-pin="on"] .perks-icon { position: static; }
         .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: auto; padding-top: 1.25rem; }
       }
     }
@@ -395,12 +443,12 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
    --pin-travel = px CANVAS (canvas phóng nó lên đúng bằng quãng cuộn thật). */
 @keyframes pin-follow { from { translate: 0 0; } to { translate: 0 var(--pin-travel, 0px); } }
 
-/* Mục lục trang chính sách bám dưới header khi cuộn. `sticky` chỉ đúng khi canvas phóng bằng zoom (layout); nhánh
-   transform (Safari) nó tính bằng toạ độ chưa phóng → trôi (đo 14/10: lệch dần tới hàng trăm px). Có scroll-driven
-   animation thì ghim bằng `pin-follow` ở MỌI nhánh; không có thì sticky ở nhánh zoom, đứng yên ở nhánh transform. */
+/* Mục lục trang chính sách bám dưới header khi cuộn. Nhánh zoom (Chrome): `sticky` — compositor ghim, đứng yên tuyệt
+   đối. Nhánh transform (Safari) sticky tính bằng toạ độ chưa phóng → trôi (đo 14/10: lệch dần tới hàng trăm px) ⇒ có
+   scroll-driven animation thì ghim bằng `pin-follow`, không có thì để đứng yên trong bài. */
 .legal-toc { position: sticky; top: 7rem; }
 @supports (animation-timeline: scroll()) {
-  .legal-toc {
+  html:not([data-canvas-strategy="zoom-cq"]) .legal-toc {
     position: static;
     animation: pin-follow linear both;
     animation-timeline: scroll(root);
@@ -413,13 +461,15 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 @keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
 /* Canvas mobile luôn rộng 390 và thẻ trải hết canvas (trừ lề 16) ⇒ dời 100% + 16px là ra ĐÚNG mép canvas = mép màn. */
 @keyframes perks-slide-in { from { translate: calc(100% + 16px) 0; } to { translate: 0 0; } }
-@keyframes perks-fade-out { from { opacity: 1; scale: 1; } to { opacity: 0; scale: 0.92; } }
-@keyframes perks-none { from { opacity: 1; } to { opacity: 1; } }
+/* Chỉ mờ, KHÔNG thu nhỏ: thu 0.92 làm mép trên/dưới thẻ sau chạy lên xuống ~13px mỗi lần cuộn qua lại
+   (user 14/10: thẻ "giật nảy lên nảy xuống" khi kéo ngược lên). */
+@keyframes perks-fade-out { from { opacity: 1; } to { opacity: 0; } }
 
 /* ---------- 3 bước hợp tác: vạch nối + vòng số sáng dần theo vị trí cuộn (CollabSection) ----------
    Mặc định = trạng thái ĐÃ XONG (vạch đầy, vòng sáng): trình duyệt chưa có scroll-driven animation (Firefox)
    hoặc người bật giảm chuyển động thấy bản tĩnh đủ ý. Có hỗ trợ thì animation `both` giữ trạng thái "chưa
-   sáng" tới khi cuộn tới. Chỉ animate transform / box-shadow của 5 phần tử nhỏ, chạy theo cuộn, không JS.
+   sáng" tới khi cuộn tới. Chỉ animate transform / opacity (chạy trên compositor) — vòng "sáng" là một lớp phủ
+   `.steps-dot-on` hiện dần, KHÔNG animate box-shadow/color (bắt vẽ lại mỗi khung cuộn).
    `animation-timeline` phải viết SAU `animation` (shorthand reset timeline về auto). */
 .steps-seg { background: var(--color-line-strong); overflow: clip; border-radius: 9999px; }
 .steps-seg-fill {
@@ -429,6 +479,10 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   transform-origin: top center;
 }
 .steps-dot {
+  color: var(--color-muted);
+  box-shadow: 0 0 0 1px var(--color-line-strong);
+}
+.steps-dot-on {
   color: var(--color-fg);
   box-shadow: 0 0 0 1px var(--color-brand-3), 0 0 28px -6px var(--color-brand);
 }
@@ -453,12 +507,14 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     --to: 0.52;
   }
   .steps-dot {
-    animation: steps-dot-on linear both;
-    animation-timeline: scroll(root);
     --from: 0.22;
     --to: 0.30;
   }
-  .steps-seg-fill, .steps-dot {
+  .steps-dot-on {
+    animation: steps-dot-on linear both;
+    animation-timeline: scroll(root);
+  }
+  .steps-seg-fill, .steps-dot-on {
     animation-range: calc(var(--cover-0) + var(--cover-len) * var(--from)) calc(var(--cover-0) + var(--cover-len) * var(--to));
   }
   /* Desktop (3 vòng cùng một hàng → cùng vị trí cuộn): tách nhịp bằng các khoảng range nối tiếp. */
@@ -473,10 +529,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 }
 @keyframes steps-fill-y { from { transform: scaleY(0); } to { transform: scaleY(1); } }
 @keyframes steps-fill-x { from { transform: scaleX(0); } to { transform: scaleX(1); } }
-@keyframes steps-dot-on {
-  from { color: var(--color-muted); box-shadow: 0 0 0 1px var(--color-line-strong); }
-  to { color: var(--color-fg); box-shadow: 0 0 0 1px var(--color-brand-3), 0 0 28px -6px var(--color-brand); }
-}
+@keyframes steps-dot-on { from { opacity: 0; } to { opacity: 1; } }
 
 /* ---------- Giảm chuyển động theo cài đặt hệ thống ---------- */
 @media (prefers-reduced-motion: reduce) {
@@ -489,7 +542,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   /* Dải chữ chạy: không tự trôi nữa, cho kéo/cuộn ngang bằng tay. */
   .marquee { overflow-x: auto; }
   .marquee-track { animation: none !important; }
-  .steps-seg-fill, .steps-dot { animation: none !important; }
+  .steps-seg-fill, .steps-dot-on { animation: none !important; }
   .spotlight { transform: none !important; }
 }
 @keyframes target-pulse {
