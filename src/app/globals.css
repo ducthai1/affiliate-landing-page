@@ -66,7 +66,9 @@ html {
      canvas vẽ lại từng khung → xé hình/nhấp nháy (growx-fe đã gặp). Neo menu nhảy thẳng tới mục. */
   /* Header phóng cùng hệ số với canvas → khoảng chừa đầu trang cũng phải nhân theo. */
   scroll-padding-top: calc(88px * var(--canvas-scale, 1));
-  background: var(--color-ink);
+  /* KHÔNG đặt background ở đây. <html> không có nền ⇒ nền của <body> được đẩy lên làm nền cả trang, vẽ DƯỚI lớp cực
+     quang + lưới (`AuroraBackground`, fixed -z-10). Có nền ở cả <html> lẫn <body> ⇒ nền body thành nền của riêng khối
+     body, vẽ ĐÈ lên lớp z-index âm ⇒ mất hết đốm màu + lưới (lỗi từ lúc port AutoScale, user báo 14/10). */
   color-scheme: dark;
 }
 
