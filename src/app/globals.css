@@ -431,6 +431,15 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
         animation-range: var(--dk-a) var(--dk-b), var(--dk-a) var(--dk-f);
         animation-timing-function: cubic-bezier(.61,1,.88,1), linear;
       }
+      /* Nhánh WebKit (portal): thẻ trồi lên bằng TRANSITION khi tới lượt (usePinProgressStep gắn data-state="in"),
+         không bám cuộn — vuốt nhanh vẫn thấy thẻ trồi lên từ từ; transition translate/opacity WebKit chạy trên card đồ hoạ. */
+      .perks[data-pin-portal][data-pin="on"] .perks-slot {
+        animation: none;
+        translate: 0 150%;
+        opacity: 0;
+        transition: translate 0.75s cubic-bezier(.22,1,.36,1), opacity 0.5s ease-out;
+      }
+      .perks[data-pin-portal][data-pin="on"] .perks-slot[data-state="in"] { translate: 0 0; opacity: 1; }
     }
     @media (max-width: 1023px) {
       .perks[data-pin="on"] .perks-run { height: calc(var(--perks-mb-run) / var(--canvas-scale, 1)); }
@@ -463,6 +472,17 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
         animation-range: var(--in-a) var(--in-b);
         animation-timing-function: cubic-bezier(.5,1,.89,1);
       }
+      /* Nhánh WebKit (portal): chồng bài theo LƯỢT — thẻ tới lượt trượt vào từ phải trong 0.6s, thẻ trước mờ đi; bám
+         cuộn thì trên iPad một cú vuốt lướt qua cả 4 thẻ, không thấy trượt (user 15/10). Thẻ đầu đứng sẵn tới khi JS gắn. */
+      .perks[data-pin-portal][data-pin="on"] .perks-slot {
+        animation: none;
+        translate: calc(100% + 16px) 0;
+        transition: translate 0.6s cubic-bezier(.22,1,.36,1), opacity 0.45s ease;
+      }
+      .perks[data-pin-portal][data-pin="on"] .perks-slot[data-state="in"],
+      .perks[data-pin-portal][data-pin="on"] .perks-slot[data-state="past"],
+      .perks[data-pin-portal][data-pin="on"] .perks-slot[data-edge="first"]:not([data-state]) { translate: 0 0; }
+      .perks[data-pin-portal][data-pin="on"] .perks-slot[data-state="past"] { opacity: 0; }
       /* Chồng bài: thẻ phải ĐẶC — kính trong suốt thì chữ thẻ dưới xuyên qua thẻ đang trượt vào, chồng chữ rối.
          Gần vuông (user 14/10: "chữ nhật ngang quá"), chữ dồn đáy kiểu poster. Tiêu đề không còn trong khung ghim nên chỉ
          chừa header + vạch + lề (~12rem canvas), kẹp 13.5–20.5rem ⇒ mọi điện thoại (cả iPhone SE) thẻ đủ cỡ vuông. */

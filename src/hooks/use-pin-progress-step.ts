@@ -19,6 +19,7 @@ export function canPinWithScrollTimeline(): boolean {
 export function usePinProgressStep<T extends HTMLElement>(
   el: T | null,
   doneAt: { desktop: number[]; mobile: number[] },
+  triggerAt: { desktop: number[]; mobile: number[] },
 ) {
   useEffect(() => {
     if (!el || !canPinWithScrollTimeline()) return;
@@ -37,11 +38,21 @@ export function usePinProgressStep<T extends HTMLElement>(
       // cùng quãng ghim với biến CSS (lib/scroll-anchors), kể cả khi ghim theo mép dưới
       const { start, run } = measurePin(el);
       const progress = run > 0 ? Math.min(1, Math.max(0, (window.scrollY - start) / run)) : 1;
-      const marks = desktop.matches ? doneAt.desktop : doneAt.mobile;
+      const isDesktop = desktop.matches;
+      // Nhánh WebKit (portal): thẻ chạy bằng transition theo LƯỢT — tới mốc là thẻ tự trượt/trồi trong thời gian cố
+      // định, vuốt nhanh cỡ nào cũng thấy chuyển động (user 15/10 iPad dọc: bám cuộn thì "quá nhanh, mất tiêu").
+      const stepMode = el.hasAttribute("data-pin-portal");
+      const marks = stepMode ? (isDesktop ? triggerAt.desktop : triggerAt.mobile) : isDesktop ? doneAt.desktop : doneAt.mobile;
       const step = marks.filter((at) => progress >= at - EPSILON).length;
       if (step === lastStep) return;
       lastStep = step;
       el.style.setProperty("--perks-fill", String(step / marks.length));
+      if (!stepMode) return;
+      // mobile chồng bài: thẻ mới nhất "in", thẻ trước nó "past" (mờ đi); desktop: mọi thẻ đã tới lượt đều "in"
+      el.querySelectorAll<HTMLElement>(".perks-slot").forEach((slot, i) => {
+        const state = i >= step ? "wait" : !isDesktop && i < step - 1 ? "past" : "in";
+        if (slot.getAttribute("data-state") !== state) slot.setAttribute("data-state", state);
+      });
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
@@ -68,5 +79,5 @@ export function usePinProgressStep<T extends HTMLElement>(
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [el, doneAt]);
+  }, [el, doneAt, triggerAt]);
 }

@@ -9,6 +9,11 @@ export interface CollabPinLayout {
   slots: { edge: PinSlotEdge; vars: Record<string, string> }[];
   /** tiến độ (0–1) mà tại đó thẻ k đã vào chỗ — JS dùng để nhảy vạch tiến trình theo số thẻ */
   doneAt: { desktop: number[]; mobile: number[] };
+  /**
+   * Nhánh WebKit (thẻ chạy bằng transition, không bám cuộn): tiến độ mà tại đó tới lượt thẻ k — JS gắn `data-state`
+   * rồi thẻ tự trượt/trồi trong thời gian cố định. Đặt ở ~1/3 khoảng bám-cuộn tương ứng để nhịp gần giống nhánh Chrome.
+   */
+  triggerAt: { desktop: number[]; mobile: number[] };
 }
 
 const frac = (percent: number) => String(+(percent / 100).toFixed(4));
@@ -45,6 +50,10 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
     doneAt: {
       desktop: slots.map((_, i) => (i * dkStep + dkSpan) / 100),
       mobile: slots.map((_, i) => (i * mbStep) / 100),
+    },
+    triggerAt: {
+      desktop: slots.map((_, i) => (i * dkStep + dkSpan * 0.25) / 100),
+      mobile: slots.map((_, i) => (i === 0 ? 0 : (i - 1 + 0.35) * mbStep) / 100),
     },
   };
 }

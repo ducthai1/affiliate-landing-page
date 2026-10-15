@@ -42,7 +42,7 @@ export function CollabPin({ layout, heading, children }: Props) {
   const base = isMobile ? BASE_MOBILE_WIDTH : BASE_WIDTH;
 
   usePinFit(pinEl);
-  usePinProgressStep(pinEl, layout.doneAt);
+  usePinProgressStep(pinEl, layout.doneAt, layout.triggerAt);
   usePinPortal(portal ? holderEl : null, portal ? pinEl : null, scale);
 
   const pin = (
