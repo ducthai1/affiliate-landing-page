@@ -79,6 +79,9 @@ export const FAQS = [
 export const COLLAB_PIN = {
   desktopRunVh: 200,
   desktopCardsEndPct: 80,
+  // Mỗi thẻ desktop trồi lên trong 35% quãng ghim, GỐI nhau (thẻ sau bắt đầu khi thẻ trước còn đang hạ cánh) thay vì
+  // nối đuôi 20% một: cùng quãng cuộn mà thẻ đi chậm hơn ~1.75× → bước mỗi khung 60 → 33px (đo 3440, 15/10).
+  desktopCardSpanPct: 35,
   // Mobile ngắn hơn growx (70/30): ghim 240vh trên điện thoại = vuốt mãi mà nội dung đứng yên → cảm giác ì (14/10).
   mobileStepVh: 45,
   mobileHoldVh: 20,

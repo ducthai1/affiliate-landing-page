@@ -376,7 +376,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
    --canvas-scale mới ra px canvas (zoom/transform nhân ngược lại khi vẽ). */
 @supports (animation-timeline: scroll()) {
   @media (prefers-reduced-motion: no-preference) {
-    /* Quãng ghim (px cuộn): [--pin-start, --pin-start + --pin-len]; thẻ mobile chạy ở tỉ lệ --in-s…--out-e của quãng đó (desktop: JS, xem usePinCardsGlide). */
+    /* Quãng ghim (px cuộn): [--pin-start, --pin-start + --pin-len]; thẻ chạy ở tỉ lệ --dk-s…--dk-e (desktop) / --in-s…--out-e (mobile) của quãng đó. */
     .perks[data-pin="on"] { --perks-fill: 0; }
     .perks[data-pin="on"] .perks-stage {
       animation: pin-follow linear both;
@@ -406,9 +406,19 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     .perks[data-pin="on"] .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
       .perks[data-pin="on"] { height: calc((100svh + var(--perks-dk-run)) / var(--canvas-scale, 1) + var(--pin-overflow, 0px)); }
-      /* Thẻ trồi 150% → 0 do JS vẽ theo vị trí cuộn "trôi" (usePinCardsGlide): bám 1:1 bằng CSS thì mỗi nấc lăn
-         chuột thẻ nhảy cục ~100px. Ở đây chỉ đặt trạng thái chờ để không nháy trước khung JS đầu tiên. */
-      .perks[data-pin="on"] .perks-slot { translate: 0 150%; will-change: translate; }
+      /* Thẻ trồi 150% → 0 bằng animation theo cuộn — chạy trên luồng card đồ hoạ (compositor), bám đúng từng khung cuộn
+         dù luồng chính bận. Từng vẽ bằng JS theo vị trí cuộn "trôi" (14/10): mượt khi máy rảnh, nhưng máy bận (tool dựng
+         clip, load ~30) thì luồng chính trễ khung → thẻ ĐỨNG rồi GIẬT (đo 15/10: 22–61 khung khựng / lượt lăn, cách này 2–6).
+         Lý do làm JS hôm đó — "mỗi nấc lăn thẻ nhảy ~100px" — là do đo bằng wheel DevTools (kiểu touchpad, nhảy thẳng);
+         con lăn thật trên Chrome được cuộn mượt nhiều khung nên thẻ theo cuộn vẫn êm. Đường cong ease-out sine (dốc đầu
+         1.6, êm hơn quad 2.0) + thẻ gối nhau ⇒ bước tối đa ~33px/khung ở 3440. */
+      .perks[data-pin="on"] .perks-slot {
+        --dk-a: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-s));
+        --dk-b: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-e));
+        animation-name: perks-rise;
+        animation-range: var(--dk-a) var(--dk-b);
+        animation-timing-function: cubic-bezier(.61,1,.88,1);
+      }
     }
     @media (max-width: 1023px) {
       .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1) + var(--pin-overflow, 0px)); }
@@ -485,6 +495,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   html:not([data-canvas-strategy="zoom-cq"]) .legal-toc { position: static; }
 }
 /* Canvas mobile luôn rộng 390 và thẻ trải hết canvas (trừ lề 16) ⇒ dời 100% + 16px là ra ĐÚNG mép canvas = mép màn. */
+@keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
 @keyframes perks-slide-in { from { translate: calc(100% + 16px) 0; } to { translate: 0 0; } }
 /* Chỉ mờ, KHÔNG thu nhỏ: thu 0.92 làm mép trên/dưới thẻ sau chạy lên xuống ~13px mỗi lần cuộn qua lại
    (user 14/10: thẻ "giật nảy lên nảy xuống" khi kéo ngược lên). */
