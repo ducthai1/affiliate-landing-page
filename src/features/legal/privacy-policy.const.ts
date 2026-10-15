@@ -115,7 +115,7 @@ export const PRIVACY_POLICY: LegalDoc = {
       blocks: [
         "Theo pháp luật Việt Nam về bảo vệ dữ liệu cá nhân, bạn có quyền được biết, xem, sửa, yêu cầu xoá, hạn chế xử lý dữ liệu và rút lại sự đồng ý.",
         `Gửi email tới ${EMAIL} với tiêu đề “Yêu cầu xoá dữ liệu” (hoặc “Yêu cầu về dữ liệu”), kèm thông tin giúp chúng tôi tìm đúng dữ liệu: SĐT/email đã gửi form, hoặc tên Facebook và link bình luận.`,
-        "Chúng tôi xác nhận đã nhận yêu cầu và xử lý chậm nhất trong 72 giờ, rồi trả lời qua email. Bạn cũng có thể tự xoá bình luận của mình trực tiếp trên Facebook bất cứ lúc nào.",
+        "Chúng tôi xác nhận đã nhận yêu cầu và xử lý chậm nhất trong 30 ngày, rồi trả lời qua email. Bạn cũng có thể tự xoá bình luận của mình trực tiếp trên Facebook bất cứ lúc nào.",
       ],
     },
     {
@@ -131,5 +131,5 @@ export const PRIVACY_POLICY: LegalDoc = {
       blocks: [`${OP} — Email: ${EMAIL}`],
     },
   ],
-  englishSummary: `${OP} runs this website, the Facebook Pages listed on it, and an internal tool that manages only those Pages (scheduling posts, reading public comments and aggregate insights; no public Facebook Login). Through the contact form we collect only what you submit (name, phone/email, company, message) to reply to you; we keep it for up to 12 months. We do not sell data, use tracking cookies or targeted advertising. To access or delete your data, email ${EMAIL} with the subject "Data deletion request" — we act within 72 hours and confirm by email.`,
+  englishSummary: `${OP} runs this website, the Facebook Pages listed on it, and an internal tool that manages only those Pages (scheduling posts, reading public comments and aggregate insights; no public Facebook Login). Through the contact form we collect only what you submit (name, phone/email, company, message) to reply to you; we keep it for up to 12 months. We do not sell data, use tracking cookies or targeted advertising. To access or delete your data, email ${EMAIL} with the subject "Data deletion request" — we act within 30 days and confirm by email.`,
 };
