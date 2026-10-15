@@ -11,9 +11,11 @@
   --color-fg: #f4f4fb;
   --color-muted: #a3a3b8;
   --color-subtle: #6d6d84;
-  --color-brand: #8b7bff;
-  --color-brand-2: #ff7ac6;
-  --color-brand-3: #5ee7ff;
+  /* Theo logo TĐ Media Studio (15/10): xanh trời → xanh dương, viền xanh ngọc, điểm nhấn vàng của tam giác play. */
+  --color-brand: #23bcfc;
+  --color-brand-2: #0694fb;
+  --color-brand-3: #4beab2;
+  --color-accent: #fed71d;
   --color-fb: #1877f2;
   --color-danger: #ff6b81;
   --color-success: #3ee6a6;

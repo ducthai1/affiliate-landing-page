@@ -1,10 +1,11 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState, type ReactNode } from "react";
 import { createPortal } from "react-dom";
 import { BASE_MOBILE_WIDTH, BASE_WIDTH } from "@/config/screen.const";
-import { NAV_ITEMS, SITE } from "@/config/site.const";
+import { BRAND_LOGO, NAV_ITEMS, SITE } from "@/config/site.const";
 import { CloseIcon, MenuIcon } from "@/components/ui/Icons";
 import { useAutoScale } from "@/hooks/use-auto-scale";
 import { useGlassSurface } from "@/hooks/use-glass-surface";
@@ -75,9 +76,15 @@ export function SiteHeader() {
         }`}
       >
         <Link href="/" className="group flex items-center gap-2.5" aria-label={`${SITE.name} — về đầu trang`}>
-          <span className="grid h-9 w-9 place-items-center rounded-xl bg-gradient-to-br from-brand via-brand-2 to-brand-3 text-lg shadow-[0_0_24px_-4px_var(--color-brand)] transition-transform duration-500 group-hover:rotate-[20deg]">
-            🏡
-          </span>
+          <Image
+            src={BRAND_LOGO.mark}
+            alt=""
+            width={36}
+            height={36}
+            unoptimized
+            priority
+            className="h-9 w-9 rounded-[10px] shadow-[0_0_24px_-6px_var(--color-brand)] transition-transform duration-500 group-hover:-rotate-6"
+          />
           <span className="font-display text-lg font-bold tracking-tight">{SITE.name}</span>
         </Link>
 

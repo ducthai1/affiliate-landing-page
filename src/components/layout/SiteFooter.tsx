@@ -1,5 +1,6 @@
+import Image from "next/image";
 import Link from "next/link";
-import { LEGAL_LINKS, NAV_ITEMS, SITE } from "@/config/site.const";
+import { BRAND_LOGO, LEGAL_LINKS, NAV_ITEMS, SITE } from "@/config/site.const";
 import { CHANNELS, channelPageUrl } from "@/features/channels";
 
 export function SiteFooter() {
@@ -8,7 +9,10 @@ export function SiteFooter() {
       <div aria-hidden className="absolute inset-x-0 top-0 h-px bg-gradient-to-r from-transparent via-brand to-transparent" />
       <div className="mx-auto grid max-w-6xl gap-10 lg:grid-cols-[1.4fr_1fr_1fr_1fr]">
         <div>
-          <p className="font-display text-xl font-bold">🏡 {SITE.name}</p>
+          <p className="flex items-center gap-3 font-display text-xl font-bold">
+            <Image src={BRAND_LOGO.mark} alt="" width={36} height={36} unoptimized className="h-9 w-9 rounded-[10px]" />
+            {SITE.name}
+          </p>
           <p className="mt-3 max-w-sm text-sm leading-relaxed text-muted">{SITE.description}</p>
         </div>
         <nav aria-label="Các kênh Facebook">
@@ -61,7 +65,7 @@ export function SiteFooter() {
         </nav>
       </div>
       <p className="mx-auto mt-14 max-w-6xl text-xs text-subtle">
-        © {SITE.name} · Vận hành bởi {SITE.operator}. Facebook là thương hiệu của Meta Platforms, Inc.
+        © {SITE.name}. Facebook là thương hiệu của Meta Platforms, Inc.
       </p>
     </footer>
   );

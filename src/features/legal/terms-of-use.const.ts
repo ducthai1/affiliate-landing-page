@@ -7,8 +7,8 @@ const EMAIL = SITE.contactEmail;
 export const TERMS_OF_USE: LegalDoc = {
   path: "/dieu-khoan",
   title: "Điều khoản sử dụng",
-  description: `Điều khoản khi dùng website ${SITE.name} và nội dung trên các Trang Facebook của ${OP}, gồm công khai về link tiếp thị liên kết (affiliate).`,
-  updatedAt: "08/10/2026",
+  description: `Điều khoản khi dùng website và nội dung trên các Trang Facebook của ${OP}, gồm công khai về link tiếp thị liên kết (affiliate).`,
+  updatedAt: "15/10/2026",
   intro: `Khi truy cập website hoặc xem nội dung trên các Trang Facebook của ${OP}, bạn đồng ý với các điều khoản dưới đây. Viết ngắn, dễ hiểu — có gì chưa rõ cứ hỏi chúng tôi.`,
   sections: [
     {

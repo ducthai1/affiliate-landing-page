@@ -1,5 +1,8 @@
 // Nội dung tĩnh của landing — sửa chữ ở đây, không cần đụng vào component.
 
+import { SITE } from "@/config/site.const";
+import { CHANNELS } from "@/features/channels";
+
 export const HERO_TITLE = {
   lead: "Mẹo hay, đồ xịn cho từng góc nhà —",
   highlight: "đúng kênh bạn cần",
@@ -39,7 +42,15 @@ export const COLLAB_STEPS = [
   { title: "Lên sóng", body: "Nội dung được sản xuất và đăng đúng kênh, đúng tệp khách." },
 ] as const;
 
+const CHANNEL_NAMES = CHANNELS.map((c) => c.name);
+
 export const FAQS = [
+  {
+    // Câu hỏi về thương hiệu: nêu các tên gọi tắt / không dấu bằng chữ hiển thị để người nhớ "TD Studio", "TĐ Media"…
+    // vẫn tìm ra (Google so khớp chữ trên trang nhiều nhất). Tên kênh lấy từ danh sách kênh, không gõ tay.
+    q: `${SITE.name} là ai?`,
+    a: `${SITE.name} (viết không dấu: TD Media Studio, gọi tắt: TĐ Media hay TD Studio) là đơn vị làm nội dung và vận hành ${CHANNEL_NAMES.length} kênh Facebook: ${CHANNEL_NAMES.slice(0, -1).join(", ")} và ${CHANNEL_NAMES.at(-1)}. Trang này gom tất cả kênh về một chỗ và là nơi nhận hợp tác review, quảng bá sản phẩm.`,
+  },
   {
     q: "Làm sao để theo dõi đúng kênh mình cần?",
     a: "Bấm vào nhu cầu ở đầu trang (Đồ bếp, Văn phòng, Thú cưng, Dọn dẹp…), trang sẽ đưa bạn tới đúng kênh. Bấm “Theo dõi trên Facebook” là xong.",

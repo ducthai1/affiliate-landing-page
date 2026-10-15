@@ -12,8 +12,8 @@ export const PRIVACY_POLICY: LegalDoc = {
   path: "/chinh-sach-bao-mat",
   title: "Chính sách bảo mật",
   description: `Cách ${OP} thu thập, sử dụng, lưu trữ và bảo vệ dữ liệu cá nhân khi bạn dùng website, gửi form liên hệ hoặc tương tác với các Trang Facebook của chúng tôi.`,
-  updatedAt: "08/10/2026",
-  intro: `${OP} ("chúng tôi") vận hành website ${SITE.name}, các Trang Facebook được giới thiệu trên website, và một công cụ nội bộ để quản lý các Trang đó. Chính sách này giải thích dữ liệu nào chúng tôi xử lý, vì sao, giữ trong bao lâu và bạn có những quyền gì.`,
+  updatedAt: "15/10/2026",
+  intro: `${OP} ("chúng tôi") vận hành website này, các Trang Facebook được giới thiệu trên website, và một công cụ nội bộ để quản lý các Trang đó. Chính sách này giải thích dữ liệu nào chúng tôi xử lý, vì sao, giữ trong bao lâu và bạn có những quyền gì.`,
   sections: [
     {
       id: "pham-vi",

@@ -15,7 +15,7 @@ export function ContactSection() {
             <div aria-hidden className="glow-soft absolute -left-52 -top-52 h-[34rem] w-[34rem] [--glow-a:30%] [--glow:var(--color-brand)]" />
             <div aria-hidden className="glow-soft absolute -bottom-56 -right-32 h-[34rem] w-[34rem] [--glow-a:20%] [--glow:var(--color-brand-2)]" />
             <div className="relative">
-              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-brand-3">Liên hệ</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.2em] text-accent">Liên hệ</p>
               <h2 id="lien-he-title" className="mt-3 font-display text-3xl font-bold leading-tight text-balance lg:text-4xl">
                 Hợp tác, hỏi đáp hay <span className="text-gradient">chỉ là ghé chào</span>?
               </h2>
