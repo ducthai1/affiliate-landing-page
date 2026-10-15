@@ -86,9 +86,10 @@ export const COLLAB_PIN = {
   mobileStepVh: 45,
   mobileHoldVh: 20,
   // Chỉ ghim khi màn còn ĐỦ CAO tính theo px canvas (AutoScale). Ngưỡng cố định (không đo bố cục đang hiện) ⇒ không
-  // bật/tắt qua lại. Thấp hơn → danh sách tĩnh (vd iPad dọc). Desktop: khung ghim cao ~622 px canvas; màn thấp hơn thì
-  // ghim theo mép dưới (data-pin-fit) nên chỉ cần vạch + thẻ (~300) nằm trọn dưới header (~82) và còn ~140 cho phần
-  // cuối tiêu đề. Từng để 700 (= cả khung vừa màn) → màn 3440×1440 (578) và laptop 1366×650 (693) mất hiệu ứng (14/10).
+  // bật/tắt qua lại. Thấp hơn → danh sách tĩnh (vd iPad dọc). Khung ghim giờ chỉ là vạch + thẻ (~264px canvas desktop,
+  // ~370 mobile) + chừa header (headerClearCanvas) — ngưỡng dư sức; từng để 700 khi còn ghim cả tiêu đề (14/10).
   minCanvasHeightDesktop: 520,
+  // Khung ghim (vạch + thẻ) không được lẹm dưới header: header đáy ~82px canvas + 14px thở.
+  headerClearCanvas: 96,
   minCanvasHeightMobile: 600,
 } as const;

@@ -339,19 +339,21 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 
 /* ---------- 4 thẻ dịch vụ hợp tác: GHIM + thẻ vào theo cuộn (kiểu "Tại sao nên là GrowX" của growx-fe) ----------
    Mặc định = bố cục tĩnh (Firefox, iOS < 26, giảm chuyển động). Có scroll-driven animation thì:
-   - khung `.perks` cao thêm một quãng cuộn; `.perks-stage` đứng yên trên màn suốt quãng đó:
+   - khung ghim `.perks-stage` CHỈ gồm vạch + thẻ (tiêu đề `.perks-head` nằm ngoài, cuộn bình thường) và đứng yên ở GIỮA
+     màn (--pin-offset, lib/scroll-anchors `data-pin-align="center"`) suốt quãng cuộn `.perks-run`. Từng ghim cả tiêu đề
+     → khối cao, thẻ dừng sát mép dưới, user thấy "khựng" (15/10). Cách đứng yên:
        · Chrome (canvas phóng bằng `zoom`): `position: sticky` — compositor tự ghim, đứng yên tuyệt đối. Ghim bằng
          animation theo cuộn thì khi cuộn NGƯỢC LÊN khung trễ 1 khung hình (lệch 17–65px tuỳ tốc độ vuốt) ⇒
          "nảy lên nảy xuống" (user 14/10, đo bằng screencast compositor);
        · Safari (canvas phóng bằng `transform`): sticky tính bằng toạ độ chưa phóng → trôi ⇒ DỊCH khung xuống đúng
          bằng quãng cuộn bằng animation `pin-follow` theo `scroll(root)`, mốc do lib/scroll-anchors đo;
-   - Desktop: thẻ k trồi lên 150% → 0 (ease-out quad) trong khoảng của nó; Mobile: chồng bài — thẻ sau trượt
-     vào từ phải, thẻ trước mờ + thu nhỏ 0.92. `translate` / `scale` / `opacity` là thuộc tính riêng → 2 animation
+   - Desktop: thẻ k trồi lên 150% → 0 + hiện dần trong khoảng của nó (gối thẻ trước); Mobile: chồng bài — thẻ sau
+     trượt vào từ phải, thẻ trước mờ đi. `translate` / `scale` / `opacity` là thuộc tính riêng → 2 animation
      trên cùng thẻ không giành nhau `transform`. Khoảng cuộn từng thẻ = biến CSS do landing.mapper tính.
    - Vạch tiến trình nhảy theo số thẻ đã vào (JS đặt --perks-fill) và trượt êm 1s. */
-.perks-stage { padding-top: 6rem; }
+.perks-head { padding-top: 6rem; }
 .perks-art { display: none; }
-@media (min-width: 1024px) { .perks-stage { padding-top: 8rem; } }
+@media (min-width: 1024px) { .perks-head { padding-top: 8rem; } }
 /* Nền ảnh bìa: quầng màu thương hiệu + lưới chấm, mờ dần xuống đáy để liền với phần chữ. Vẽ một lần (không animation). */
 .perks-art {
   position: relative;
@@ -382,18 +384,14 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       animation: pin-follow linear both;
       animation-timeline: scroll(root);
       animation-range: var(--pin-start, 0px) calc(var(--pin-start, 0px) + var(--pin-len, 0px));
-      min-height: calc(100svh / var(--canvas-scale, 1));
-      display: flex;
-      flex-direction: column;
-      justify-content: center;
-      padding-top: 5.5rem;
-      padding-bottom: 2rem;
-      overflow: clip; /* thẻ đang nằm dưới / bên phải chờ vào không lòi ra ngoài khung */
+      padding-block: 1rem;
+      /* thẻ mobile chờ bên phải không lòi ra mép màn; chiều dọc để mở — thẻ desktop chờ phía dưới đã trong suốt */
+      overflow-x: clip;
     }
-    /* top âm = ghim theo MÉP DƯỚI khi khung cao hơn màn (--pin-overflow do lib/scroll-anchors đo; vừa màn thì 0). */
+    /* Ghim GIỮA màn: --pin-offset (px canvas) do lib/scroll-anchors đo theo chiều cao khung + màn. */
     html[data-canvas-strategy="zoom-cq"] .perks[data-pin="on"] .perks-stage {
       position: sticky;
-      top: calc(-1 * var(--pin-overflow, 0px));
+      top: var(--pin-offset, 0px);
       animation: none;
     }
     .perks[data-pin="on"] .perks-slot {
@@ -405,23 +403,26 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
        thẻ nhảy lên xuống trong lúc đang vào (chỉ thấy trên máy có chuột; headless báo hover:none nên test không thấy). */
     .perks[data-pin="on"] .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
-      .perks[data-pin="on"] { height: calc((100svh + var(--perks-dk-run)) / var(--canvas-scale, 1) + var(--pin-overflow, 0px)); }
+      .perks[data-pin="on"] .perks-run { height: calc(var(--perks-dk-run) / var(--canvas-scale, 1)); }
       /* Thẻ trồi 150% → 0 bằng animation theo cuộn — chạy trên luồng card đồ hoạ (compositor), bám đúng từng khung cuộn
          dù luồng chính bận. Từng vẽ bằng JS theo vị trí cuộn "trôi" (14/10): mượt khi máy rảnh, nhưng máy bận (tool dựng
          clip, load ~30) thì luồng chính trễ khung → thẻ ĐỨNG rồi GIẬT (đo 15/10: 22–61 khung khựng / lượt lăn, cách này 2–6).
          Lý do làm JS hôm đó — "mỗi nấc lăn thẻ nhảy ~100px" — là do đo bằng wheel DevTools (kiểu touchpad, nhảy thẳng);
          con lăn thật trên Chrome được cuộn mượt nhiều khung nên thẻ theo cuộn vẫn êm. Đường cong ease-out sine (dốc đầu
-         1.6, êm hơn quad 2.0) + thẻ gối nhau ⇒ bước tối đa ~33px/khung ở 3440. */
+         1.6, êm hơn quad 2.0) + thẻ gối nhau ⇒ bước tối đa ~33px/khung ở 3440. Khung ghim giờ thấp (chỉ vạch + thẻ) nên
+         thẻ chờ ở 150% nằm TRONG màn → hiện dần trong 40% đầu khoảng của nó (opacity: thuộc tính riêng, vẫn compositor). */
       .perks[data-pin="on"] .perks-slot {
         --dk-a: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-s));
         --dk-b: calc(var(--pin-start, 0px) + var(--pin-len, 0px) * var(--dk-e));
-        animation-name: perks-rise;
-        animation-range: var(--dk-a) var(--dk-b);
-        animation-timing-function: cubic-bezier(.61,1,.88,1);
+        --dk-f: calc(var(--dk-a) + (var(--dk-b) - var(--dk-a)) * 0.4);
+        animation-name: perks-rise, perks-appear;
+        animation-timeline: scroll(root), scroll(root);
+        animation-range: var(--dk-a) var(--dk-b), var(--dk-a) var(--dk-f);
+        animation-timing-function: cubic-bezier(.61,1,.88,1), linear;
       }
     }
     @media (max-width: 1023px) {
-      .perks[data-pin="on"] { height: calc((100svh + var(--perks-mb-run)) / var(--canvas-scale, 1) + var(--pin-overflow, 0px)); }
+      .perks[data-pin="on"] .perks-run { height: calc(var(--perks-mb-run) / var(--canvas-scale, 1)); }
       .perks[data-pin="on"] .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); }
       /* Thẻ k trượt vào ở bước k (translate) và mờ đi khi thẻ k+1 vào (opacity) — 2 thuộc tính khác nhau nên cả 2
          chạy trên compositor. Thẻ đầu chỉ mờ, thẻ cuối chỉ trượt: khai MỘT animation thật, KHÔNG dùng keyframes giả
@@ -450,14 +451,13 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
         animation-range: var(--in-a) var(--in-b);
         animation-timing-function: cubic-bezier(.5,1,.89,1);
       }
-      .perks[data-pin="on"] .perks-stage { padding-top: 5rem; padding-bottom: 1.5rem; }
       /* Chồng bài: thẻ phải ĐẶC — kính trong suốt thì chữ thẻ dưới xuyên qua thẻ đang trượt vào, chồng chữ rối.
-         Gần vuông (user 14/10: "chữ nhật ngang quá"), chữ dồn đáy kiểu poster. Cao = phần màn còn lại sau tiêu đề
-         + vạch (~31.5rem canvas), kẹp 13.5–20.5rem ⇒ màn thấp (iPhone SE) thẻ tự thấp lại, vẫn vừa khung ghim. */
+         Gần vuông (user 14/10: "chữ nhật ngang quá"), chữ dồn đáy kiểu poster. Tiêu đề không còn trong khung ghim nên chỉ
+         chừa header + vạch + lề (~12rem canvas), kẹp 13.5–20.5rem ⇒ mọi điện thoại (cả iPhone SE) thẻ đủ cỡ vuông. */
       .perks[data-pin="on"] .perks-slot > .glass {
         display: flex;
         flex-direction: column;
-        min-height: clamp(13.5rem, calc(100svh / var(--canvas-scale, 1) - 31.5rem), 20.5rem);
+        min-height: clamp(13.5rem, calc(100svh / var(--canvas-scale, 1) - 12rem), 20.5rem);
         background: linear-gradient(160deg, color-mix(in oklab, var(--color-ink-2) 88%, var(--color-brand) 12%), var(--color-ink-2));
         border-color: var(--color-line-strong);
       }
@@ -466,12 +466,6 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       .perks[data-pin="on"] .perks-art { display: block; flex: 1 1 0; min-height: 0; margin: -1.5rem -1.5rem 0.75rem; }
       .perks[data-pin="on"] .perks-icon { position: absolute; top: 1.5rem; left: 1.5rem; z-index: 1; }
       .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: 0; }
-      /* Màn thấp (iPhone SE): phần trống chỉ còn ~70px → ẩn hình, icon về chỗ cũ, chữ dồn đáy thẻ. */
-      @media (max-height: 700px) {
-        .perks[data-pin="on"] .perks-art { display: none; }
-        .perks[data-pin="on"] .perks-icon { position: static; }
-        .perks[data-pin="on"] .perks-slot > .glass > h3 { margin-top: auto; padding-top: 1.25rem; }
-      }
     }
   }
 }
@@ -496,6 +490,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 }
 /* Canvas mobile luôn rộng 390 và thẻ trải hết canvas (trừ lề 16) ⇒ dời 100% + 16px là ra ĐÚNG mép canvas = mép màn. */
 @keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
+@keyframes perks-appear { from { opacity: 0; } to { opacity: 1; } }
 @keyframes perks-slide-in { from { translate: calc(100% + 16px) 0; } to { translate: 0 0; } }
 /* Chỉ mờ, KHÔNG thu nhỏ: thu 0.92 làm mép trên/dưới thẻ sau chạy lên xuống ~13px mỗi lần cuộn qua lại
    (user 14/10: thẻ "giật nảy lên nảy xuống" khi kéo ngược lên). */
