@@ -4,11 +4,12 @@ import { useEffect } from "react";
 import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
 import { COLLAB_PIN } from "@/features/landing/landing.const";
 import { CANVAS_SCALE_VAR } from "@/lib/auto-scale-strategy";
+import { stableViewportHeight } from "@/lib/scroll-anchors";
 import { canPinWithScrollTimeline } from "./use-pin-progress-step";
 
 /**
  * Đặt `data-pin="on" | "off"` cho khung ghim. Bật khi: trình duyệt có scroll-driven animation, không bật giảm
- * chuyển động, và chiều cao màn tính theo px CANVAS (innerHeight / --canvas-scale) đủ chứa tiêu đề + vạch + thẻ.
+ * chuyển động, và chiều cao màn tính theo px CANVAS (100svh / --canvas-scale) đủ chứa tiêu đề + vạch + thẻ.
  * Nhờ AutoScale, con số này không đổi khi zoom trình duyệt (zoom 125% trên 1440×900 vẫn là 900 px canvas).
  */
 // Nhận PHẦN TỬ (không phải ref): khung ghim được portal ra <body> sau khi mount ở nhánh WebKit → phần tử đổi, hook
@@ -21,7 +22,8 @@ export function usePinFit<T extends HTMLElement>(el: T | null) {
     const apply = () => {
       const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(CANVAS_SCALE_VAR)) || 1;
       const need = desktop.matches ? COLLAB_PIN.minCanvasHeightDesktop : COLLAB_PIN.minCanvasHeightMobile;
-      const on = canPinWithScrollTimeline() && window.innerHeight / scale >= need;
+      // cao màn ổn định (svh): innerHeight đổi theo thanh địa chỉ lúc vuốt → ghim bật/tắt giữa chừng
+      const on = canPinWithScrollTimeline() && stableViewportHeight() / scale >= need;
       // setAttribute (không gán dataset): đây là phần tử DOM, không phải prop React — lint chặn phép gán thuộc tính.
       const current = el.getAttribute("data-pin");
       if (current && (current === "on") === on) return;

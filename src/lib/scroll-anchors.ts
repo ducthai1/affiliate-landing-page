@@ -24,6 +24,24 @@
 const ANCHOR_SELECTOR = "[data-scroll-anchor]";
 const STAGE_SELECTOR = "[data-pin-stage]";
 
+let viewportProbe: HTMLElement | null = null;
+
+/**
+ * Chiều cao màn ỔN ĐỊNH (100svh = màn khi thanh công cụ trình duyệt hiện đủ, px thật). KHÔNG dùng `innerHeight`:
+ * trên iOS/Android nó đổi mỗi lần thanh địa chỉ thu gọn / hiện lại lúc vuốt → mọi mốc ghim tính lại giữa lúc cuộn →
+ * khung nhảy dọc, khoảng chạy thẻ xê dịch → thẻ "nảy ra vào" (iPad mini dọc 15/10: 557 → 600px làm thẻ nhảy ngang 42px).
+ * Đo bằng một phần tử fixed cao 100svh nằm NGOÀI canvas (không bị phóng).
+ */
+export function stableViewportHeight(): number {
+  if (!viewportProbe) {
+    viewportProbe = document.createElement("div");
+    viewportProbe.setAttribute("aria-hidden", "");
+    viewportProbe.style.cssText = "position:fixed;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
+    document.body.appendChild(viewportProbe);
+  }
+  return viewportProbe.getBoundingClientRect().height || window.innerHeight;
+}
+
 function readCanvasScale(): number {
   return parseFloat(getComputedStyle(document.documentElement).getPropertyValue("--canvas-scale")) || 1;
 }
@@ -35,7 +53,7 @@ function readCanvasScale(): number {
  */
 export function measurePin(el: HTMLElement) {
   const r = el.getBoundingClientRect();
-  const vp = window.innerHeight;
+  const vp = stableViewportHeight();
   const stageH = el.querySelector<HTMLElement>(STAGE_SELECTOR)?.getBoundingClientRect().height ?? vp;
   const scale = readCanvasScale();
   let top = (parseFloat(el.dataset.pinTop || "0") || 0) * scale;
@@ -70,7 +88,7 @@ function measureAll(root: Document) {
   const zoom = cssZoomOf(anchors[0]); // mọi mốc cùng nằm trong một canvas
   const px = (real: number) => `${Math.round((real / zoom) * 100) / 100}px`;
   const canvasPx = (real: number) => `${Math.round((real / canvasScale) * 100) / 100}px`;
-  const vp = window.innerHeight;
+  const vp = stableViewportHeight();
   anchors.forEach((el) => {
     const r = el.getBoundingClientRect();
     setVar(el, "--doc-top", px(r.top + window.scrollY));
