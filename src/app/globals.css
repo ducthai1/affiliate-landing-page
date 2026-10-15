@@ -352,6 +352,8 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
      trên cùng thẻ không giành nhau `transform`. Khoảng cuộn từng thẻ = biến CSS do landing.mapper tính.
    - Vạch tiến trình nhảy theo số thẻ đã vào (JS đặt --perks-fill) và trượt êm 1s. */
 .perks-head { padding-top: 6rem; }
+/* Nhánh WebKit: khung ghim portal ra <body> (CollabPin + usePinPortal đặt `top`), nằm đè đúng ô giữ chỗ trong canvas. */
+.perks[data-pin-portal] { position: absolute; left: 0; width: 100%; z-index: 1; }
 .perks-art { display: none; }
 @media (min-width: 1024px) { .perks-head { padding-top: 8rem; } }
 /* Nền ảnh bìa: quầng màu thương hiệu + lưới chấm, mờ dần xuống đáy để liền với phần chữ. Vẽ một lần (không animation). */
@@ -384,14 +386,22 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       animation: pin-follow linear both;
       animation-timeline: scroll(root);
       animation-range: var(--pin-start, 0px) calc(var(--pin-start, 0px) + var(--pin-len, 0px));
-      padding-block: 1rem;
       /* thẻ mobile chờ bên phải không lòi ra mép màn; chiều dọc để mở — thẻ desktop chờ phía dưới đã trong suốt */
       overflow-x: clip;
     }
+    .perks[data-pin="on"] .perks-body { padding-block: 1rem; }
     /* Ghim GIỮA màn: --pin-offset (px canvas) do lib/scroll-anchors đo theo chiều cao khung + màn. */
     html[data-canvas-strategy="zoom-cq"] .perks[data-pin="on"] .perks-stage {
       position: sticky;
       top: var(--pin-offset, 0px);
+      animation: none;
+    }
+    /* Nhánh WebKit (portal, ngoài canvas → px ở đây là px THẬT): sticky thật — WebKit tự ghim trên luồng cuộn, không
+       nảy như `pin-follow` (animation theo cuộn WebKit chạy ở luồng chính). `pin-follow` chỉ còn là đường lùi khi
+       portal chưa gắn (khung hình đầu). */
+    .perks[data-pin-portal][data-pin="on"] .perks-stage {
+      position: sticky;
+      top: var(--pin-top-px, 0px);
       animation: none;
     }
     .perks[data-pin="on"] .perks-slot {
@@ -404,6 +414,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     .perks[data-pin="on"] .perks-slot > .glass { translate: none; }
     @media (min-width: 1024px) {
       .perks[data-pin="on"] .perks-run { height: calc(var(--perks-dk-run) / var(--canvas-scale, 1)); }
+      .perks[data-pin-portal][data-pin="on"] .perks-run { height: var(--perks-dk-run); }
       /* Thẻ trồi 150% → 0 bằng animation theo cuộn — chạy trên luồng card đồ hoạ (compositor), bám đúng từng khung cuộn
          dù luồng chính bận. Từng vẽ bằng JS theo vị trí cuộn "trôi" (14/10): mượt khi máy rảnh, nhưng máy bận (tool dựng
          clip, load ~30) thì luồng chính trễ khung → thẻ ĐỨNG rồi GIẬT (đo 15/10: 22–61 khung khựng / lượt lăn, cách này 2–6).
@@ -423,6 +434,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     }
     @media (max-width: 1023px) {
       .perks[data-pin="on"] .perks-run { height: calc(var(--perks-mb-run) / var(--canvas-scale, 1)); }
+      .perks[data-pin-portal][data-pin="on"] .perks-run { height: var(--perks-mb-run); }
       .perks[data-pin="on"] .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); }
       /* Thẻ k trượt vào ở bước k (translate) và mờ đi khi thẻ k+1 vào (opacity) — 2 thuộc tính khác nhau nên cả 2
          chạy trên compositor. Thẻ đầu chỉ mờ, thẻ cuối chỉ trượt: khai MỘT animation thật, KHÔNG dùng keyframes giả

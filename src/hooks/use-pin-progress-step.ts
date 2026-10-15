@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect } from "react";
 import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
 import { measurePin } from "@/lib/scroll-anchors";
 
@@ -17,11 +17,10 @@ export function canPinWithScrollTimeline(): boolean {
  * Chỉ nghe cuộn khi khung đang trong màn; không ghim được (Firefox / giảm chuyển động) thì để CSS mặc định = đầy.
  */
 export function usePinProgressStep<T extends HTMLElement>(
-  ref: RefObject<T | null>,
+  el: T | null,
   doneAt: { desktop: number[]; mobile: number[] },
 ) {
   useEffect(() => {
-    const el = ref.current;
     if (!el || !canPinWithScrollTimeline()) return;
 
     const desktop = matchMedia(DESKTOP_MEDIA_QUERY);
@@ -69,5 +68,5 @@ export function usePinProgressStep<T extends HTMLElement>(
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(frame);
     };
-  }, [ref, doneAt]);
+  }, [el, doneAt]);
 }

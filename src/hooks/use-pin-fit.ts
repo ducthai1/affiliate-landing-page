@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, type RefObject } from "react";
+import { useEffect } from "react";
 import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
 import { COLLAB_PIN } from "@/features/landing/landing.const";
 import { CANVAS_SCALE_VAR } from "@/lib/auto-scale-strategy";
@@ -11,9 +11,10 @@ import { canPinWithScrollTimeline } from "./use-pin-progress-step";
  * chuyển động, và chiều cao màn tính theo px CANVAS (innerHeight / --canvas-scale) đủ chứa tiêu đề + vạch + thẻ.
  * Nhờ AutoScale, con số này không đổi khi zoom trình duyệt (zoom 125% trên 1440×900 vẫn là 900 px canvas).
  */
-export function usePinFit<T extends HTMLElement>(ref: RefObject<T | null>) {
+// Nhận PHẦN TỬ (không phải ref): khung ghim được portal ra <body> sau khi mount ở nhánh WebKit → phần tử đổi, hook
+// phải chạy lại với phần tử mới (ref + effect 1 lần sẽ bám mãi phần tử cũ đã tháo).
+export function usePinFit<T extends HTMLElement>(el: T | null) {
   useEffect(() => {
-    const el = ref.current;
     if (!el) return;
     const desktop = matchMedia(DESKTOP_MEDIA_QUERY);
 
@@ -21,8 +22,10 @@ export function usePinFit<T extends HTMLElement>(ref: RefObject<T | null>) {
       const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(CANVAS_SCALE_VAR)) || 1;
       const need = desktop.matches ? COLLAB_PIN.minCanvasHeightDesktop : COLLAB_PIN.minCanvasHeightMobile;
       const on = canPinWithScrollTimeline() && window.innerHeight / scale >= need;
-      if ((el.dataset.pin === "on") === on && el.dataset.pin) return;
-      el.dataset.pin = on ? "on" : "off";
+      // setAttribute (không gán dataset): đây là phần tử DOM, không phải prop React — lint chặn phép gán thuộc tính.
+      const current = el.getAttribute("data-pin");
+      if (current && (current === "on") === on) return;
+      el.setAttribute("data-pin", on ? "on" : "off");
       // Tắt ghim → bỏ tiến độ vạch do JS ghi, để CSS mặc định (vạch đầy) áp lại.
       if (!on) el.style.removeProperty("--perks-fill");
     };
@@ -38,5 +41,5 @@ export function usePinFit<T extends HTMLElement>(ref: RefObject<T | null>) {
       desktop.removeEventListener("change", apply);
       watch.disconnect();
     };
-  }, [ref]);
+  }, [el]);
 }

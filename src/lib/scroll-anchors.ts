@@ -82,6 +82,8 @@ function measureAll(root: Document) {
     setVar(el, "--pin-len", px(pin.run));
     setVar(el, "--pin-travel", canvasPx(pin.run));
     setVar(el, "--pin-offset", canvasPx(pin.top));
+    // khung ghim portal ra ngoài canvas (nhánh WebKit, CollabPin) dùng px thật
+    setVar(el, "--pin-top-px", `${Math.round(pin.top * 100) / 100}px`);
   });
 }
 

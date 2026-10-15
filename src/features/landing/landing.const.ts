@@ -91,5 +91,7 @@ export const COLLAB_PIN = {
   minCanvasHeightDesktop: 520,
   // Khung ghim (vạch + thẻ) không được lẹm dưới header: header đáy ~82px canvas + 14px thở.
   headerClearCanvas: 96,
-  minCanvasHeightMobile: 600,
+  // iPad dọc: iOS tự phóng khung 390 (IpadPortraitViewport) ⇒ chỉ còn ~557px canvas. Khung ghim mobile ~402 + header
+  // 96 = ~498 ⇒ ngưỡng 500 (từng 600 khi còn ghim cả tiêu đề → iPad dọc mất hiệu ứng, user 15/10).
+  minCanvasHeightMobile: 500,
 } as const;
