@@ -11,7 +11,7 @@ export interface CollabPinLayout {
   doneAt: { desktop: number[]; mobile: number[] };
   /**
    * Nhánh WebKit (thẻ chạy bằng transition, không bám cuộn): tiến độ mà tại đó tới lượt thẻ k — JS gắn `data-state`
-   * rồi thẻ tự trượt/trồi trong thời gian cố định. Đặt ở ~1/3 khoảng bám-cuộn tương ứng để nhịp gần giống nhánh Chrome.
+   * rồi thẻ tự trượt/trồi trong thời gian cố định. Các mốc cách đều nhau để mỗi thẻ có đủ quãng cuộn "dừng xem".
    */
   triggerAt: { desktop: number[]; mobile: number[] };
 }
@@ -25,6 +25,7 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
   const dkSpan = Math.min(desktopCardSpanPct, desktopCardsEndPct);
   const dkStep = count > 1 ? (desktopCardsEndPct - dkSpan) / (count - 1) : 0;
   const mbRunVh = (count - 1) * mobileStepVh + mobileHoldVh;
+  const stepMbRunVh = (count - 1) * COLLAB_PIN.stepMobileStepVh + COLLAB_PIN.stepMobileHoldVh;
   const mbStep = (mobileStepVh / mbRunVh) * 100;
 
   const slots = Array.from({ length: count }, (_, i) => ({
@@ -45,6 +46,7 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
     wrapperVars: {
       "--perks-dk-run": `${desktopRunVh}vh`,
       "--perks-mb-run": `${mbRunVh}vh`,
+      "--perks-mb-step-run": `${stepMbRunVh}vh`,
     },
     slots,
     doneAt: {
@@ -52,8 +54,10 @@ export function buildCollabPinLayout(count: number): CollabPinLayout {
       mobile: slots.map((_, i) => (i * mbStep) / 100),
     },
     triggerAt: {
-      desktop: slots.map((_, i) => (i * dkStep + dkSpan * 0.25) / 100),
-      mobile: slots.map((_, i) => (i === 0 ? 0 : (i - 1 + 0.35) * mbStep) / 100),
+      // desktop: 4 mốc chia đều trên phần thẻ chạy (10/30/50/70% quãng 200vh ⇒ cách nhau 40vh)
+      desktop: slots.map((_, i) => ((i + 0.5) * (desktopCardsEndPct / count)) / 100),
+      // mobile: thẻ i tới lượt sau i × 60vh trên quãng --perks-mb-step-run (thẻ đầu có sẵn từ đầu)
+      mobile: slots.map((_, i) => (i * COLLAB_PIN.stepMobileStepVh) / stepMbRunVh),
     },
   };
 }

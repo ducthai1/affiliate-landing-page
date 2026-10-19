@@ -85,6 +85,11 @@ export const COLLAB_PIN = {
   // Mobile ngắn hơn growx (70/30): ghim 240vh trên điện thoại = vuốt mãi mà nội dung đứng yên → cảm giác ì (14/10).
   mobileStepVh: 45,
   mobileHoldVh: 20,
+  // Nhánh Safari (thẻ chạy theo LƯỢT bằng transition): quãng cuộn là thời gian "dừng xem" mỗi thẻ, không phải quãng thẻ
+  // di chuyển ⇒ dài hơn bản bám cuộn. Mốc cũ (~1/3 khoảng bám cuộn) làm thẻ 2 bật lên sau ~16% màn — "scroll xíu là
+  // nhảy card" (user 19/10 iPad mini). Giờ mỗi thẻ cách nhau 60vh, giữ thẻ cuối thêm 30vh.
+  stepMobileStepVh: 60,
+  stepMobileHoldVh: 30,
   // Chỉ ghim khi màn còn ĐỦ CAO tính theo px canvas (AutoScale). Ngưỡng cố định (không đo bố cục đang hiện) ⇒ không
   // bật/tắt qua lại. Thấp hơn → danh sách tĩnh (vd iPad dọc). Khung ghim giờ chỉ là vạch + thẻ (~264px canvas desktop,
   // ~370 mobile) + chừa header (headerClearCanvas) — ngưỡng dư sức; từng để 700 khi còn ghim cả tiêu đề (14/10).

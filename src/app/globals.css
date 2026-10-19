@@ -443,7 +443,7 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
     }
     @media (max-width: 1023px) {
       .perks[data-pin="on"] .perks-run { height: calc(var(--perks-mb-run) / var(--canvas-scale, 1)); }
-      .perks[data-pin-portal][data-pin="on"] .perks-run { height: var(--perks-mb-run); }
+      .perks[data-pin-portal][data-pin="on"] .perks-run { height: var(--perks-mb-step-run); }
       .perks[data-pin="on"] .perks-cards { display: grid; grid-template-columns: minmax(0, 1fr); }
       /* Thẻ k trượt vào ở bước k (translate) và mờ đi khi thẻ k+1 vào (opacity) — 2 thuộc tính khác nhau nên cả 2
          chạy trên compositor. Thẻ đầu chỉ mờ, thẻ cuối chỉ trượt: khai MỘT animation thật, KHÔNG dùng keyframes giả
