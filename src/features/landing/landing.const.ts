@@ -73,8 +73,7 @@ export const FAQS = [
  * Nhịp ghim của 4 thẻ dịch vụ (kiểu "Tại sao nên là GrowX" của growx-fe):
  * - Desktop (≥1024): khung đứng yên `desktopRunVh` vh cuộn; thẻ k trồi lên trong phần k/4 của
  *   `desktopCardsEndPct`% đầu, phần còn lại giữ nguyên để thẻ cuối đứng xong mới tới nội dung dưới.
- * - Mobile (<1024): chồng bài — thẻ sau trượt vào từ phải, thẻ trước mờ + thu nhỏ; mỗi bước `mobileStepVh` vh,
- *   giữ thêm `mobileHoldVh` vh sau thẻ cuối.
+ * - Mobile (<1024): KHÔNG ghim — thẻ xếp dọc, hiện dần từ dưới lên theo vị trí cuộn của chính nó (CSS, globals.css).
  */
 export const COLLAB_PIN = {
   desktopRunVh: 200,
@@ -82,21 +81,10 @@ export const COLLAB_PIN = {
   // Mỗi thẻ desktop trồi lên trong 35% quãng ghim, GỐI nhau (thẻ sau bắt đầu khi thẻ trước còn đang hạ cánh) thay vì
   // nối đuôi 20% một: cùng quãng cuộn mà thẻ đi chậm hơn ~1.75× → bước mỗi khung 60 → 33px (đo 3440, 15/10).
   desktopCardSpanPct: 35,
-  // Mobile ngắn hơn growx (70/30): ghim 240vh trên điện thoại = vuốt mãi mà nội dung đứng yên → cảm giác ì (14/10).
-  mobileStepVh: 45,
-  mobileHoldVh: 20,
-  // Nhánh Safari (thẻ chạy theo LƯỢT bằng transition): quãng cuộn là thời gian "dừng xem" mỗi thẻ, không phải quãng thẻ
-  // di chuyển ⇒ dài hơn bản bám cuộn. Mốc cũ (~1/3 khoảng bám cuộn) làm thẻ 2 bật lên sau ~16% màn — "scroll xíu là
-  // nhảy card" (user 19/10 iPad mini). Giờ mỗi thẻ cách nhau 60vh, giữ thẻ cuối thêm 30vh.
-  stepMobileStepVh: 60,
-  stepMobileHoldVh: 30,
   // Chỉ ghim khi màn còn ĐỦ CAO tính theo px canvas (AutoScale). Ngưỡng cố định (không đo bố cục đang hiện) ⇒ không
-  // bật/tắt qua lại. Thấp hơn → danh sách tĩnh (vd iPad dọc). Khung ghim giờ chỉ là vạch + thẻ (~264px canvas desktop,
-  // ~370 mobile) + chừa header (headerClearCanvas) — ngưỡng dư sức; từng để 700 khi còn ghim cả tiêu đề (14/10).
+  // bật/tắt qua lại. Thấp hơn → hàng thẻ tĩnh. Khung ghim chỉ là vạch + thẻ (~264px canvas) + chừa header
+  // (headerClearCanvas) — ngưỡng dư sức; từng để 700 khi còn ghim cả tiêu đề (14/10).
   minCanvasHeightDesktop: 520,
   // Khung ghim (vạch + thẻ) không được lẹm dưới header: header đáy ~82px canvas + 14px thở.
   headerClearCanvas: 96,
-  // iPad dọc: iOS tự phóng khung 390 (IpadPortraitViewport) ⇒ chỉ còn ~557px canvas. Khung ghim mobile ~402 + header
-  // 96 = ~498 ⇒ ngưỡng 500 (từng 600 khi còn ghim cả tiêu đề → iPad dọc mất hiệu ứng, user 15/10).
-  minCanvasHeightMobile: 500,
 } as const;

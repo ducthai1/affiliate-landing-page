@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect } from "react";
-import { DESKTOP_MEDIA_QUERY } from "@/config/screen.const";
 import { measurePin } from "@/lib/scroll-anchors";
 
 const EPSILON = 1e-4;
@@ -18,13 +17,12 @@ export function canPinWithScrollTimeline(): boolean {
  */
 export function usePinProgressStep<T extends HTMLElement>(
   el: T | null,
-  doneAt: { desktop: number[]; mobile: number[] },
-  triggerAt: { desktop: number[]; mobile: number[] },
+  doneAt: number[],
+  triggerAt: number[],
 ) {
   useEffect(() => {
     if (!el || !canPinWithScrollTimeline()) return;
 
-    const desktop = matchMedia(DESKTOP_MEDIA_QUERY);
     let frame = 0;
     let lastStep = -1;
 
@@ -38,29 +36,30 @@ export function usePinProgressStep<T extends HTMLElement>(
       // cùng quãng ghim với biến CSS (lib/scroll-anchors), kể cả khi ghim theo mép dưới
       const { start, run } = measurePin(el);
       const progress = run > 0 ? Math.min(1, Math.max(0, (window.scrollY - start) / run)) : 1;
-      const isDesktop = desktop.matches;
-      // Nhánh WebKit (portal): thẻ chạy bằng transition theo LƯỢT — tới mốc là thẻ tự trượt/trồi trong thời gian cố
-      // định, vuốt nhanh cỡ nào cũng thấy chuyển động (user 15/10 iPad dọc: bám cuộn thì "quá nhanh, mất tiêu").
+      // Nhánh WebKit (portal): thẻ chạy bằng transition theo LƯỢT — tới mốc là thẻ tự trồi trong thời gian cố định,
+      // vuốt nhanh cỡ nào cũng thấy chuyển động (user 15/10 iPad: bám cuộn thì "quá nhanh, mất tiêu").
       const stepMode = el.hasAttribute("data-pin-portal");
-      const marks = stepMode ? (isDesktop ? triggerAt.desktop : triggerAt.mobile) : isDesktop ? doneAt.desktop : doneAt.mobile;
+      const marks = stepMode ? triggerAt : doneAt;
       const step = marks.filter((at) => progress >= at - EPSILON).length;
       if (step === lastStep) return;
       lastStep = step;
       el.style.setProperty("--perks-fill", String(step / marks.length));
       if (!stepMode) return;
-      // mobile chồng bài: thẻ mới nhất "in", thẻ trước nó "past" (mờ đi); desktop: mọi thẻ đã tới lượt đều "in"
       el.querySelectorAll<HTMLElement>(".perks-slot").forEach((slot, i) => {
-        const state = i >= step ? "wait" : !isDesktop && i < step - 1 ? "past" : "in";
+        const state = i < step ? "in" : "wait";
         if (slot.getAttribute("data-state") !== state) slot.setAttribute("data-state", state);
       });
     };
     const onScroll = () => {
       if (!frame) frame = requestAnimationFrame(update);
     };
-    const onBreakpoint = () => {
+    // Ghim bật/tắt (usePinFit: đổi breakpoint, đổi cỡ màn) → tính lại ngay, không đợi lần cuộn sau (nhánh WebKit:
+    // thẻ chưa có data-state là đang ẩn chờ).
+    const pinWatch = new MutationObserver(() => {
       lastStep = -1;
       update();
-    };
+    });
+    pinWatch.observe(el, { attributes: true, attributeFilter: ["data-pin"] });
 
     const visibility = new IntersectionObserver(([entry]) => {
       if (entry.isIntersecting) {
@@ -71,11 +70,10 @@ export function usePinProgressStep<T extends HTMLElement>(
       }
     });
     visibility.observe(el);
-    desktop.addEventListener("change", onBreakpoint);
 
     return () => {
       visibility.disconnect();
-      desktop.removeEventListener("change", onBreakpoint);
+      pinWatch.disconnect();
       window.removeEventListener("scroll", onScroll);
       cancelAnimationFrame(frame);
     };

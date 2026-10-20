@@ -37,8 +37,9 @@ export function CollabPin({ layout, heading, children }: Props) {
   const [holderEl, setHolderEl] = useState<HTMLDivElement | null>(null);
   const mounted = useHasMounted();
   const strategy = useSyncExternalStore(noopSubscribe, pickScaleStrategy, () => "zoom-cq" as const);
-  const portal = mounted && strategy === "transform-cq";
   const { scale, isMobile } = useAutoScale(BASE_WIDTH, BASE_MOBILE_WIDTH);
+  // Portal chỉ cần khi GHIM (desktop); mobile không ghim (thẻ xếp dọc) nên để trong canvas.
+  const portal = mounted && strategy === "transform-cq" && !isMobile;
   const base = isMobile ? BASE_MOBILE_WIDTH : BASE_WIDTH;
 
   usePinFit(pinEl);

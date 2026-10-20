@@ -21,9 +21,10 @@ export function usePinFit<T extends HTMLElement>(el: T | null) {
 
     const apply = () => {
       const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(CANVAS_SCALE_VAR)) || 1;
-      const need = desktop.matches ? COLLAB_PIN.minCanvasHeightDesktop : COLLAB_PIN.minCanvasHeightMobile;
-      // cao màn ổn định (svh): innerHeight đổi theo thanh địa chỉ lúc vuốt → ghim bật/tắt giữa chừng
-      const on = canPinWithScrollTimeline() && stableViewportHeight() / scale >= need;
+      // Chỉ desktop ghim; mobile là cột thẻ dọc hiện dần (không ghim). Cao màn ổn định (svh): innerHeight đổi theo
+      // thanh địa chỉ lúc vuốt → ghim bật/tắt giữa chừng.
+      const on =
+        desktop.matches && canPinWithScrollTimeline() && stableViewportHeight() / scale >= COLLAB_PIN.minCanvasHeightDesktop;
       // setAttribute (không gán dataset): đây là phần tử DOM, không phải prop React — lint chặn phép gán thuộc tính.
       const current = el.getAttribute("data-pin");
       if (current && (current === "on") === on) return;
