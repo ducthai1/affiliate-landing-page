@@ -9,7 +9,7 @@ import { canPinWithScrollTimeline } from "./use-pin-progress-step";
 
 /**
  * Đặt `data-pin="on" | "off"` cho khung ghim. Bật khi: trình duyệt có scroll-driven animation, không bật giảm
- * chuyển động, và chiều cao màn tính theo px CANVAS (100svh / --canvas-scale) đủ chứa tiêu đề + vạch + thẻ.
+ * chuyển động, và chiều cao màn tính theo px CANVAS (stableViewportHeight / --canvas-scale) đủ chứa tiêu đề + vạch + thẻ.
  * Nhờ AutoScale, con số này không đổi khi zoom trình duyệt (zoom 125% trên 1440×900 vẫn là 900 px canvas).
  */
 // Nhận PHẦN TỬ (không phải ref): khung ghim được portal ra <body> sau khi mount ở nhánh WebKit → phần tử đổi, hook
@@ -21,7 +21,7 @@ export function usePinFit<T extends HTMLElement>(el: T | null) {
 
     const apply = () => {
       const scale = parseFloat(getComputedStyle(document.documentElement).getPropertyValue(CANVAS_SCALE_VAR)) || 1;
-      // Chỉ desktop ghim; mobile là cột thẻ dọc hiện dần (không ghim). Cao màn ổn định (svh): innerHeight đổi theo
+      // Chỉ desktop ghim; mobile là cột thẻ dọc hiện dần (không ghim). Cao màn ổn định (stableViewportHeight): innerHeight đổi theo
       // thanh địa chỉ lúc vuốt → ghim bật/tắt giữa chừng.
       const on =
         desktop.matches && canPinWithScrollTimeline() && stableViewportHeight() / scale >= COLLAB_PIN.minCanvasHeightDesktop;

@@ -8,6 +8,7 @@ import { AutoScaleWrapper } from "@/components/layout/AutoScaleWrapper";
 import { IpadPortraitViewport } from "@/components/layout/IpadPortraitViewport";
 import { AuroraBackground } from "@/components/motion/AuroraBackground";
 import { ViewportEffects } from "@/components/motion/ViewportEffects";
+import { ViewportDebugOverlay } from "@/components/dev/ViewportDebugOverlay";
 import "./globals.css";
 
 const body = Be_Vietnam_Pro({
@@ -71,6 +72,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
         <IpadPortraitViewport />
         <AutoScaleWrapper>{children}</AutoScaleWrapper>
         <ViewportEffects />
+        <ViewportDebugOverlay />
       </body>
     </html>
   );

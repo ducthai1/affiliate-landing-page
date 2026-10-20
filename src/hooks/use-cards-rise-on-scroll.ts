@@ -83,23 +83,15 @@ export function useCardsRiseOnScroll(list: HTMLElement | null) {
       request();
     };
 
-    const visibility = new IntersectionObserver(
-      ([entry]) => {
-        if (entry.isIntersecting) {
-          window.addEventListener("scroll", request, { passive: true });
-          sync();
-        } else window.removeEventListener("scroll", request);
-      },
-      { rootMargin: "50% 0px" },
-    );
-    visibility.observe(list);
+    // Nghe cuộn LUÔN (không chờ IntersectionObserver báo "vào màn"): iPad dọc phóng bằng meta viewport, nếu IO không
+    // báo thì thẻ đứng im mãi ở vị trí lệch ("không có hiệu ứng", user 20/10). Mỗi lần cuộn chỉ đo 1 khối + 4 thẻ.
+    window.addEventListener("scroll", request, { passive: true });
     mobile.addEventListener("change", sync);
     reduce.addEventListener("change", sync);
     window.addEventListener("resize", request);
     sync();
 
     return () => {
-      visibility.disconnect();
       mobile.removeEventListener("change", sync);
       reduce.removeEventListener("change", sync);
       window.removeEventListener("resize", request);

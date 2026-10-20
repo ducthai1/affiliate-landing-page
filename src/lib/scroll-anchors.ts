@@ -24,22 +24,27 @@
 const ANCHOR_SELECTOR = "[data-scroll-anchor]";
 const STAGE_SELECTOR = "[data-pin-stage]";
 
-let viewportProbe: HTMLElement | null = null;
+let stableHeight = 0;
+let stableWidth = 0;
 
 /**
- * Chiều cao màn ỔN ĐỊNH (100svh = màn khi thanh công cụ trình duyệt hiện đủ, px thật). KHÔNG dùng `innerHeight`:
- * trên iOS/Android nó đổi mỗi lần thanh địa chỉ thu gọn / hiện lại lúc vuốt → mọi mốc ghim tính lại giữa lúc cuộn →
- * khung nhảy dọc, khoảng chạy thẻ xê dịch → thẻ "nảy ra vào" (iPad mini dọc 15/10: 557 → 600px làm thẻ nhảy ngang 42px).
- * Đo bằng một phần tử fixed cao 100svh nằm NGOÀI canvas (không bị phóng).
+ * Chiều cao màn ỔN ĐỊNH (px CSS của phần đang thấy) cho mọi phép đo theo cuộn.
+ *  - Không dùng thẳng `innerHeight`: trên iOS/Android nó đổi mỗi lần thanh địa chỉ thu gọn / hiện lại lúc vuốt → mốc
+ *    tính lại giữa cú vuốt → thẻ "nảy ra vào" (iPad mini 15/10). Thanh công cụ chỉ đổi chiều cao ~10–15% ⇒ máy cảm ứng
+ *    GIỮ giá trị cũ, chỉ đo lại khi bề ngang đổi (xoay / kéo cửa sổ) hoặc chênh > 20%.
+ *  - KHÔNG dùng `100svh`: iPad dọc đổi meta viewport SAU khi tải (IpadPortraitViewport: width=390, initial-scale≈1.97)
+ *    mà Safari vẫn tính svh theo khung cũ ≈ gấp đôi phần đang thấy ⇒ mọi mốc lệch: thẻ "chạy xong" khi còn ngoài màn,
+ *    lên tới nơi thì đứng im — chuỗi lỗi iPad dọc 15–20/10 ("quá nhanh", "scroll xíu nhảy card", "không có hiệu ứng").
  */
 export function stableViewportHeight(): number {
-  if (!viewportProbe) {
-    viewportProbe = document.createElement("div");
-    viewportProbe.setAttribute("aria-hidden", "");
-    viewportProbe.style.cssText = "position:fixed;top:0;left:0;width:0;height:100svh;visibility:hidden;pointer-events:none";
-    document.body.appendChild(viewportProbe);
+  const h = window.innerHeight;
+  const w = document.documentElement.clientWidth;
+  if (!matchMedia("(pointer: coarse)").matches) return h; // máy bàn: không có thanh công cụ co giãn
+  if (!stableHeight || w !== stableWidth || Math.abs(h - stableHeight) > stableHeight * 0.2) {
+    stableHeight = h;
+    stableWidth = w;
   }
-  return viewportProbe.getBoundingClientRect().height || window.innerHeight;
+  return stableHeight;
 }
 
 function readCanvasScale(): number {
