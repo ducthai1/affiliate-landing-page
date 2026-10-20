@@ -372,8 +372,11 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   .perks-art { display: block; flex: 1 1 0; min-height: 0; margin: -1.5rem -1.5rem 0.75rem; }
   .perks-icon { position: absolute; top: 1.5rem; left: 1.5rem; z-index: 1; }
   .perks-slot > .glass > h3 { margin-top: 0; }
-  /* `translate` do useCardsRiseOnScroll ghi mỗi khung lúc cuộn → lớp riêng, không vẽ lại thẻ */
-  .perks-slot > .glass { will-change: translate; }
+  /* `translate` do useCardsRiseOnScroll ghi mỗi khung lúc cuộn → lớp riêng, không vẽ lại thẻ. KHÔNG được có
+     transition: class `transition-transform` của thẻ (Tailwind 4 gồm cả `translate`, 0.5s ease) làm MỖI lần ghi khởi
+     động lại một transition từ đầu đoạn ease-in ⇒ thẻ gần như đứng im suốt lúc cuộn (đo: còn lệch ~90%, đè dãy số
+     1-2-3 tới 234px) rồi mới nhảy lên khi ngừng cuộn (user 20/10). Hover nâng thẻ vốn đã bị translate inline đè. */
+  .perks-slot > .glass { will-change: translate; transition: none; }
 }
 /* Nền ảnh bìa: quầng màu thương hiệu + lưới chấm, mờ dần xuống đáy để liền với phần chữ. Vẽ một lần (không animation). */
 .perks-art {

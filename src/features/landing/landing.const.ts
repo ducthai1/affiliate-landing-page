@@ -88,6 +88,13 @@ export const COLLAB_RISE = {
   staggerMs: 250,
   /** độ trễ đuổi theo cuộn (hằng số thời gian của làm mượt mũ) */
   smoothMs: 250,
+  /**
+   * Dòng thời gian BẮT ĐẦU khi khối thẻ còn cách đáy màn thêm `leadViewports` màn hình (trang mẫu: `enter: top
+   * -2×innerHeight`) và KẾT THÚC khi đáy khối chạm đáy màn. Đo trang mẫu lúc đứng yên: thẻ vừa ló ở đáy màn chỉ còn
+   * lệch 9–20%, ở 40% màn còn 0–3% ⇒ thẻ gần về chỗ trước khi lọt vào mắt. Bản đầu bắt đầu muộn 1 màn (thẻ ló vào
+   * lệch 100%) ⇒ chỗ thẻ trống trơn, vuốt nhanh thì thẻ thụt xuống đè dãy số 1-2-3 rồi mới nhảy lên (user 20/10).
+   */
+  leadViewports: 1,
 } as const;
 
 export const COLLAB_PIN = {
