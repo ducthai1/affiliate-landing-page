@@ -234,7 +234,6 @@ body {
    thì vòng số / thẻ còn ở trạng thái cũ tới khi kịp chạy lại). Chúng chạy trên compositor, không tốn khi khuất. */
 [data-offscreen] .perks-stage,
 [data-offscreen] .perks-slot,
-[data-offscreen] .perks-slot > .glass,
 [data-offscreen] .steps-seg-fill,
 [data-offscreen] .steps-dot-on,
 [data-offscreen] .legal-toc { animation-play-state: running !important; }
@@ -350,8 +349,8 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
          bằng quãng cuộn bằng animation `pin-follow` theo `scroll(root)`, mốc do lib/scroll-anchors đo;
    - Desktop: thẻ k trồi lên 150% → 0 + hiện dần trong khoảng của nó (gối thẻ trước); `translate` / `opacity` là thuộc
      tính riêng → 2 animation trên cùng thẻ không giành nhau `transform`. Khoảng cuộn từng thẻ = biến CSS do landing.mapper.
-   - Mobile (< 1024): KHÔNG ghim — 4 thẻ xếp dọc, mỗi thẻ hiện dần từ dưới lên theo vị trí của CHÍNH nó trong màn
-     (kiểu "Our Process" của wondermakers.digital/services; user 20/10). Từng là chồng bài trượt ngang trong khung ghim:
+   - Mobile (< 1024): KHÔNG ghim — 4 thẻ xếp dọc, trồi lên theo cuộn có làm mượt bằng JS (useCardsRiseOnScroll,
+     chép "Our Process" của wondermakers.digital/services; user 20/10). Từng là chồng bài trượt ngang trong khung ghim:
      iPad dọc lỗi liên tục (tắt ghim, nảy, quá nhanh) — xem decision landing.
    - Vạch tiến trình nhảy theo số thẻ đã vào (JS đặt --perks-fill) và trượt êm 1s. */
 .perks-head { padding-top: 6rem; }
@@ -373,6 +372,8 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
   .perks-art { display: block; flex: 1 1 0; min-height: 0; margin: -1.5rem -1.5rem 0.75rem; }
   .perks-icon { position: absolute; top: 1.5rem; left: 1.5rem; z-index: 1; }
   .perks-slot > .glass > h3 { margin-top: 0; }
+  /* `translate` do useCardsRiseOnScroll ghi mỗi khung lúc cuộn → lớp riêng, không vẽ lại thẻ */
+  .perks-slot > .glass { will-change: translate; }
 }
 /* Nền ảnh bìa: quầng màu thương hiệu + lưới chấm, mờ dần xuống đáy để liền với phần chữ. Vẽ một lần (không animation). */
 .perks-art {
@@ -457,18 +458,6 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
       }
       .perks[data-pin-portal][data-pin="on"] .perks-slot[data-state="in"] { translate: 0 0; opacity: 1; }
     }
-    /* Mobile: thẻ k lùi xuống 6rem khi mép trên của nó còn ở ĐÁY màn, rồi về chỗ (ease-out) khi lên tới 30% màn —
-       thẻ "trồi lên muộn hơn trang" như wondermakers (đo 20/10: lùi ~75–110px lúc vào, ~10px ở giữa màn, 0 ở 1/3 trên).
-       Mốc = vị trí cuộn của CHÍNH thẻ (--doc-top/--vp-h do lib/scroll-anchors đo trên <li>, animation chạy trên .glass
-       bên trong → chuyển động không làm sai số đo). Chrome: compositor; không cần ghim nên không đụng sticky/portal. */
-    @media (max-width: 1023px) {
-      .perks-slot > .glass {
-        animation: perks-rise-in linear both;
-        animation-timeline: scroll(root);
-        animation-range: calc(var(--doc-top, 0px) - var(--vp-h, 0px)) calc(var(--doc-top, 0px) - var(--vp-h, 0px) * 0.3);
-        animation-timing-function: cubic-bezier(.5,1,.89,1);
-      }
-    }
   }
 }
 /* Khung ghim theo cuộn (lib/scroll-anchors): dịch xuống đúng bằng quãng đã cuộn ⇒ đứng yên trên màn.
@@ -492,7 +481,6 @@ html[data-glass-header] .animate-aurora { animation-play-state: paused; }
 }
 @keyframes perks-rise { from { translate: 0 150%; } to { translate: 0 0; } }
 @keyframes perks-appear { from { opacity: 0; } to { opacity: 1; } }
-@keyframes perks-rise-in { from { translate: 0 6rem; } to { translate: 0 0; } }
 
 /* ---------- 3 bước hợp tác: vạch nối + vòng số sáng dần theo vị trí cuộn (CollabSection) ----------
    Mặc định = trạng thái ĐÃ XONG (vạch đầy, vòng sáng): trình duyệt chưa có scroll-driven animation (Firefox)

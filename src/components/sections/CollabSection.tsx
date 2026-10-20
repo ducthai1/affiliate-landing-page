@@ -30,8 +30,6 @@ export function CollabSection() {
           <li
             key={s.title}
             className="perks-slot"
-            // mobile: mốc cuộn của CHÍNH thẻ (lib/scroll-anchors) cho hiệu ứng hiện dần từ dưới lên
-            data-scroll-anchor
             style={PIN_LAYOUT.slots[i].vars as CSSProperties}
           >
             <div className="glass group relative h-full overflow-hidden rounded-3xl p-6 transition-transform duration-500 hover:-translate-y-1.5">

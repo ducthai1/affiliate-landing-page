@@ -6,6 +6,7 @@ import { BASE_MOBILE_WIDTH, BASE_WIDTH } from "@/config/screen.const";
 import type { CollabPinLayout } from "@/features/landing/landing.mapper";
 import { COLLAB_PIN } from "@/features/landing/landing.const";
 import { useAutoScale } from "@/hooks/use-auto-scale";
+import { useCardsRiseOnScroll } from "@/hooks/use-cards-rise-on-scroll";
 import { useHasMounted } from "@/hooks/use-has-mounted";
 import { usePinFit } from "@/hooks/use-pin-fit";
 import { usePinPortal } from "@/hooks/use-pin-portal";
@@ -29,12 +30,13 @@ const noopSubscribe = () => () => {};
  *  - WebKit (canvas phóng bằng `transform`): sticky trong khối bị transform trôi, ghim bằng animation thì WebKit chạy ở
  *    luồng chính → nảy lên xuống (iPad ngang, 15/10) ⇒ khung được PORTAL ra <body> (như header), nội dung tự phóng bằng
  *    transform, ô giữ chỗ trong canvas giữ chiều cao (usePinPortal).
- * Thẻ (desktop trồi lên, mobile trượt vào) chạy bằng CSS scroll-driven — mốc do lib/scroll-anchors đo, KHÔNG vẽ bằng JS
+ * Mobile không ghim: thẻ xếp dọc, trồi lên theo cuộn có làm mượt (useCardsRiseOnScroll). Thẻ desktop chạy bằng CSS scroll-driven — mốc do lib/scroll-anchors đo, KHÔNG vẽ bằng JS
  * theo khung (máy bận là thẻ khựng). Vạch tiến trình nhảy theo số thẻ. Không hỗ trợ / giảm chuyển động → bố cục tĩnh.
  */
 export function CollabPin({ layout, heading, children }: Props) {
   const [pinEl, setPinEl] = useState<HTMLDivElement | null>(null);
   const [holderEl, setHolderEl] = useState<HTMLDivElement | null>(null);
+  const [cardsEl, setCardsEl] = useState<HTMLUListElement | null>(null);
   const mounted = useHasMounted();
   const strategy = useSyncExternalStore(noopSubscribe, pickScaleStrategy, () => "zoom-cq" as const);
   const { scale, isMobile } = useAutoScale(BASE_WIDTH, BASE_MOBILE_WIDTH);
@@ -45,6 +47,7 @@ export function CollabPin({ layout, heading, children }: Props) {
   usePinFit(pinEl);
   usePinProgressStep(pinEl, layout.doneAt, layout.triggerAt);
   usePinPortal(portal ? holderEl : null, portal ? pinEl : null, scale);
+  useCardsRiseOnScroll(cardsEl);
 
   const pin = (
     <div
@@ -64,7 +67,9 @@ export function CollabPin({ layout, heading, children }: Props) {
               <div aria-hidden className="perks-line mx-auto mb-10 w-full max-w-[860px]">
                 <span className="perks-line-fill" />
               </div>
-              <ul className="perks-cards grid gap-5 lg:grid-cols-4">{children}</ul>
+              <ul ref={setCardsEl} className="perks-cards grid gap-5 lg:grid-cols-4">
+                {children}
+              </ul>
             </div>
           </div>
         </div>

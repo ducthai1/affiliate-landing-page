@@ -75,6 +75,21 @@ export const FAQS = [
  *   `desktopCardsEndPct`% đầu, phần còn lại giữ nguyên để thẻ cuối đứng xong mới tới nội dung dưới.
  * - Mobile (<1024): KHÔNG ghim — thẻ xếp dọc, hiện dần từ dưới lên theo vị trí cuộn của chính nó (CSS, globals.css).
  */
+/**
+ * Mobile (< 1024): 4 thẻ xếp dọc trồi lên theo cuộn — chép đúng "Our Process" của wondermakers.digital/services
+ * (đọc script của họ 20/10: anime.js timeline gắn tiến độ cuộn qua khối thẻ, mỗi thẻ `--tw-translate-y` 100% → 0%,
+ * so le 250ms trên tween 1000ms, ease-out quad, mobile `sync: .25` = playhead đuổi theo cuộn có độ trễ). Đo trang mẫu:
+ * sau cú cuộn đột ngột giá trị còn trôi tiếp ~1.5s, hằng số thời gian ~250ms — chính cái "từ từ" user muốn.
+ */
+export const COLLAB_RISE = {
+  /** thẻ bắt đầu lệch xuống bằng ĐÚNG chiều cao của nó */
+  fromPercent: 100,
+  tweenMs: 1000,
+  staggerMs: 250,
+  /** độ trễ đuổi theo cuộn (hằng số thời gian của làm mượt mũ) */
+  smoothMs: 250,
+} as const;
+
 export const COLLAB_PIN = {
   desktopRunVh: 200,
   desktopCardsEndPct: 80,
